@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Home, LayoutGrid, MessageCircle, ScanLine, Share2 } from "lucide-react";
 import { Logo } from "../Logo";
-import { useMe } from "./MeContext";
+import { MECHANIC_PERSONAS, useMe } from "./MeContext";
 
 const TABS = [
   { href: "/app", icon: Home, label: "Home" },
@@ -17,7 +17,7 @@ const TABS = [
 
 export default function PhoneShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
-  const { error } = useMe();
+  const { error, me, persona, setPersona } = useMe();
   return (
     <div className="relative min-h-screen bg-ink lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-10 lg:px-10">
       {/* Desktop side panel */}
@@ -25,10 +25,20 @@ export default function PhoneShell({ children }: { children: React.ReactNode }) 
         <Link href="/"><Logo className="text-xl" /></Link>
         <h1 className="h-display text-5xl">The mechanic<br /><span className="gradient-molten">app.</span></h1>
         <p className="max-w-sm text-bone-dim">
-          What Ravi of Sai Puncture Works (Pune) sees. Every action hits the live FastAPI backend: scans credit points,
-          pay the tool EMI and show up in the Command Centre.
+          You are <b className="text-bone">{me?.mechanic.name ?? "…"}</b> of {me?.mechanic.shop_name ?? "…"}. Every action hits the
+          live FastAPI backend: scans credit points, pay the tool EMI and show up in the Command Centre.
         </p>
+        <div>
+          <p className="eyebrow mb-2">Switch persona</p>
+          <div className="flex flex-wrap gap-2">
+            {MECHANIC_PERSONAS.map((p) => (
+              <button key={p} onClick={() => setPersona(p)}
+                className={`chip capitalize ${persona === p ? "!border-molten !text-molten" : ""}`}>{p}</button>
+            ))}
+          </div>
+        </div>
         <div className="flex gap-2">
+          <Link href="/personas" className="btn-ghost">All personas</Link>
           <Link href="/command" className="btn-ghost">Command Centre →</Link>
         </div>
       </aside>
