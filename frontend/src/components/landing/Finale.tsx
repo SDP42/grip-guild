@@ -30,7 +30,7 @@ export default function Finale() {
       </motion.p>
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 border-t border-white/10 px-4 py-8 text-xs text-bone-mute sm:px-6">
         <Logo className="text-sm" />
-        <p>Concept prototype for Eurogrip TORQ Challenge 4.0 by Team Outliers. All data shown is simulated.</p>
+        <p>Concept prototype for Eurogrip TORQ Challenge 4.0 by Team Outliers: Swayam Panchal, Rishit Lahoti, Jeevesh Bodhani (AI &amp; DS, DJSCE). All data shown is simulated.</p>
       </div>
     </footer>
   );
