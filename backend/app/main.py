@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -19,7 +20,9 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+# Comma-separated list in production (e.g. your Vercel URL); "*" for local demos.
+ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o.strip()]
+app.add_middleware(CORSMiddleware, allow_origins=ORIGINS, allow_methods=["*"], allow_headers=["*"])
 
 for r in (personas.router, mechanics.router, advocacy.router, analytics.router, engage.router, ecosystem.router, live.router):
     app.include_router(r)
