@@ -1,0 +1,16 @@
+[
+ {"id":"hook","text":"In India, when a two-wheeler tyre wears out, riders don't ask a dealer. They ask the mechanic down the road."},
+ {"id":"problem","text":"Eurogrip's own research shows mechanics know the brand, but rarely recommend it. Stock lags behind rivals, cash schemes fade, and mechanics now want tools and respect more than cash."},
+ {"id":"solution","text":"So we built Grip Guild. We don't pay mechanics. We make them more successful, with three things that compound: tools, customers, and status."},
+ {"id":"demo","text":"This is our live prototype: a FastAPI backend, a Next.js frontend, and eight personas you can actually play."},
+ {"id":"ravi","text":"Meet Ravi. He runs a puncture shop and doesn't even stock Eurogrip. His Guild Coach shows what will grow his shop today."},
+ {"id":"scan","text":"Every verified fitment earns points, and half of them pay off a tyre changer he will own. Scan the same tyre twice, and Fraud Guard blocks it."},
+ {"id":"sos","text":"When Priya, a delivery rider, gets a flat, Puncture SOS finds the nearest Guild shop. Ravi accepts, and she sees his arrival time instantly."},
+ {"id":"shelf","text":"No stock? Ghost Shelf lets Ravi sell Eurogrip anyway, delivered by the dealer within hours, and referral codes reward his word alone."},
+ {"id":"twin","text":"Every fitted tyre gets a 3D digital twin, with a wear heatmap, history, and a genuine-tyre check."},
+ {"id":"command","text":"And Eurogrip sees it all: the funnel, fraud alerts, and true lift against control districts, while Budget Autopilot moves money to what works."},
+ {"id":"unique","text":"What makes it different? It rewards influence without inventory, turns advocacy into owned tools, and sends mechanics customers instead of cash."},
+ {"id":"impact","text":"Our simulator projects thirty-five thousand active shops and nearly nine lakh extra tyres in year one, at about two hundred and eighty rupees each."},
+ {"id":"feasible","text":"It fits the brief's budget, runs on Eurogrip's existing dealers and field force, and the pilot can start in eight weeks."},
+ {"id":"close","text":"Grip Guild. Tools, customers, status. Built by Team Outliers."}
+]
