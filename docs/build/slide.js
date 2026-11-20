@@ -49,6 +49,15 @@ const rich = (items, { size = 8.5, color = TXT, boldColor = INK, para = 2.5 } = 
 };
 const body = (items, x, y, w, h, opt = {}) => s.addText(rich(items, opt), { x, y, w, h, valign: "top", margin: [0, 2, 0, 2], isTextBox: true, fit: "none" });
 
+// compact table: rows[0] = header; heads = [headFill, headColor]
+const mini = (rows, x, y, w, colW, rowH, headFill, headColor, size = 6.8, border = "E5E7EB") =>
+  s.addTable(rows.map((r, i) => r.map((c, j) => {
+    const parts = String(c || " ").split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
+    return { text: parts.map((t) => ({ text: t.startsWith("**") ? t.slice(2, -2) : t, options: { bold: i === 0 || j === 0 || t.startsWith("**") } })), options: {
+      fontFace: BODY, fontSize: i === 0 ? size + 0.3 : size, color: i === 0 ? headColor : j === 0 ? INK : TXT,
+      fill: { color: i === 0 ? headFill : "FFFFFF" }, margin: [1, 3, 1, 3], valign: "middle" } };
+  })), { x, y, w, colW, rowH, border: { type: "solid", pt: 0.5, color: border } });
+
 // ═══════════ HEADER ═══════════
 s.addText([{ text: "Grip", options: { color: INK } }, { text: "Guild", options: { color: OR } }],
   { x: 0.25, y: 0.12, w: 2.5, h: 0.62, fontFace: HEAD, fontSize: 36, bold: true, margin: 0, isTextBox: true });
@@ -90,25 +99,24 @@ body([
 // 2 Who it's for
 card(3.35, yA, 2.55, hA, T.sky[0]);
 head(3.47, yA + 0.07, 2.4, "2", "Who it's for", T.sky[1]);
-const who = [
-  ["Ravi", "puncture shop, no Eurogrip stock"], ["Gurpreet", "Grandmaster garage, Circle mentor"], ["Imran", "new Apprentice, day 6"],
-  ["Lakshmi", "EV-scooter specialist"], ["Priya", "gig rider with a flat tyre"], ["Dealer", "redeems codes, ships Ghost Shelf"],
-  ["Anita", "field officer, 140 shops"], ["Brand team", "funnel, lift, fraud, budget"],
-];
-who.forEach(([n, d], i) => {
-  const y = yA + 0.44 + i * 0.208;
-  s.addShape(pres.shapes.OVAL, { x: 3.45, y: y + 0.015, w: 0.17, h: 0.17, fill: { color: i < 4 ? OR : i === 4 ? "0EA5E9" : i < 7 ? "7C3AED" : INK } });
-  s.addText([{ text: n + "  ", options: { bold: true, color: INK } }, { text: d, options: { color: TXT } }],
-    { x: 3.68, y, w: 2.2, h: 0.2, fontFace: BODY, fontSize: 8, valign: "middle", margin: 0, isTextBox: true });
-});
+mini([["Persona", "Pain today", "Guild gives"],
+  ["Ravi", "no Eurogrip stock", "Ghost Shelf · referrals"],
+  ["Gurpreet", "no recognition", "Grandmaster board"],
+  ["Imran", "few customers", "starter kit · Academy"],
+  ["Lakshmi", "EV skills, capital", "EV quest · credit"],
+  ["Priya", "flat mid-shift", "SOS · Pit Pass"],
+  ["Dealer", "can't reach shops", "code & order sales"],
+  ["Anita", "140 shops to cover", "Nudge priorities"],
+  ["Brand", "can't prove ROI", "Lift · Autopilot"]],
+  3.43, yA + 0.42, 2.4, [0.56, 0.86, 0.98], 0.188, "DCEFFC", "0369A1", 6.6, "CFE6F7");
 
 // 3 Solution
 card(6.0, yA, 4.2, hA, T.orange[0]);
 head(6.12, yA + 0.07, 4.0, "3", "Our solution: 3 pillars, 22 features", T.orange[1]);
 const pillars = [
-  ["Tools", "grow the workshop", "C2410C", ["**Fitments Pay Off Your Tools:** half of each fitment's points repay a machine the shop will own", "**Starter kit · Tool Store · Circle Tool Pools**"]],
+  ["Tools", "grow the workshop", "C2410C", ["**Fitments Pay Off Your Tools:** points repay a machine the shop will own", "**Starter kit** on day 1", "**Tool Store** ~20% < MRP", "**Circle Tool Pools**"]],
   ["Customers", "fill the workshop", "3F6212", ["**Puncture SOS** leads", "**Customer Boomerang** reminders", "**Ghost Shelf:** sell with zero stock, dealer delivers in 2–6 h", "**Fleet Pit Pass**"]],
-  ["Status", "be the master", "B45309", ["**Apprentice → Grandmaster**", "**Living Shop Board** with verify-QR & ratings", "**Academy** badges", "**Guild Passport** credit"]],
+  ["Status", "be the master", "B45309", ["**Apprentice → Grandmaster**", "**Living Shop Board:** upgrades by tier; riders rate", "**Academy** badges", "**Guild Passport** credit"]],
 ];
 pillars.forEach(([t, sub, c, items], i) => {
   const x = 6.1 + i * 1.37;
@@ -124,14 +132,15 @@ body([
 // 4 Unique
 card(10.3, yA, 2.8, hA, T.lime[0]);
 head(10.42, yA + 0.07, 2.6, "4", "Why it's unique", T.lime[1]);
-body([
-  "**Influence without inventory:** referral codes (80 pts) & Ghost Shelf reward the word, not the warehouse.",
-  "**Advocacy pays for owned tools,** so shops stay for months, not days.",
-  "**The brand sends customers,** not cash.",
-  "**A digital twin of every tyre** closes the rider-data gap and fights counterfeits.",
-  "**Spend follows proven lift** (Lift Engine + Autopilot).",
-  "**Riders win too:** SOS rescue, health cards, genuine-tyre check.",
-], 10.38, yA + 0.42, 2.66, hA - 0.46, { size: 8 });
+mini([["", "Typical cash / QR scheme", "Grip Guild"],
+  ["Rewards", "a purchase", "**influence too** (codes, SOS)"],
+  ["Currency", "cash that fades", "**owned tools**, customers"],
+  ["Stock", "must stock to earn", "**Ghost Shelf**: zero stock"],
+  ["Rider", "nothing", "**SOS, health cards, twin**"],
+  ["Proof", "counts scans", "**lift vs control**"],
+  ["Data", "pack level", "**tyre & rider level**"],
+  ["Channel", "separate app", "**WhatsApp-first**"]],
+  10.38, yA + 0.42, 2.64, [0.5, 0.94, 1.2], 0.205, "E3F4C8", "3F6212", 6.7, "D3E8B4");
 
 // ═══════════ ROW B ═══════════
 const yB = 3.36, hB = 1.98;
@@ -195,43 +204,59 @@ s.addTable(ba.map((r, i) => r.map((c, j) => ({ text: c, options: {
 // 9 Feasibility & viability
 card(4.05, yC, 3.0, hC, T.teal[0]);
 head(4.17, yC + 0.07, 2.85, "9", "Feasibility & viability", T.teal[1]);
-body([
-  "**₹25 Cr/yr,** inside 1.5–2% of BU revenue; ~₹7.1k per active shop.",
-  "**Runs on existing** dealers & field force (~140 shops/officer).",
-  "**Prototype live today;** pilot in 8 weeks, 10 vs 10 districts.",
-  "**Sustained by** tool EMI, tier upkeep, quests, repeat customers, credit.",
-  "**Self-funding:** Fleet Pass fees & Ghost Shelf sales; ROI ≈ " + sim.roi_x + "× gross profit.",
-  "**Risks handled:** fraud rules, earn caps, DPDP-2023 privacy.",
-], 4.13, yC + 0.42, 2.87, hC - 0.45, { size: 7.7 });
+mini([["Lens", "Verdict", "Evidence"],
+  ["Financial", "✓ ₹25 Cr/yr", "1.5–2% of BU; ~₹7.1k / active shop"],
+  ["Operational", "✓ High", "existing dealers; ~140 shops/officer"],
+  ["Technical", "✓ Live", "deployed prototype, ~45 APIs, tests"],
+  ["Time", "✓ 8 weeks", "pilot: 10 vs 10 districts"],
+  ["Sustained", "✓ Yes", "tool EMI, tiers, quests, repeat riders"],
+  ["Self-funding", "✓ " + sim.roi_x + "× ROI", "Fleet Pass fees, Ghost Shelf sales"],
+  ["Risk", "✓ Managed", "fraud rules, earn caps, DPDP 2023"]],
+  4.12, yC + 0.42, 2.86, [0.66, 0.68, 1.52], 0.178, "CCF3E6", "0F766E", 6.6, "B9E8D7");
 
 // 10 Measurability
 card(7.15, yC, 2.55, hC, T.violet[0]);
 head(7.27, yC + 0.07, 2.4, "10", "Measurability", T.violet[1]);
+s.addText("Guild Score 0–1000 per shop", { x: 7.25, y: yC + 0.4, w: 2.35, h: 0.15, fontFace: BODY, fontSize: 7, bold: true, color: INK, margin: 0, isTextBox: true });
+let gx = 7.25;
+[["Fitments 30", 30, "E8501A"], ["Referrals 30", 30, "65A30D"], ["Rating 15", 15, "F59E0B"], ["Skills 15", 15, "7C3AED"], ["Streak", 10, "0EA5E9"]].forEach(([n, v, c]) => {
+  const w = 2.35 * v / 100;
+  s.addShape(pres.shapes.RECTANGLE, { x: gx, y: yC + 0.57, w, h: 0.22, fill: { color: c }, line: { color: "FFFFFF", width: 0.75 } });
+  s.addText(n, { x: gx, y: yC + 0.57, w, h: 0.22, fontFace: BODY, fontSize: 5.8, bold: true, color: "FFFFFF", align: "center", valign: "middle", margin: 0, isTextBox: true });
+  gx += w;
+});
 body([
-  "**Every reward is a verified event:** single-use tyre QR, dealer-bound codes.",
-  "**Guild Score 0–1000** per shop.",
+  "**Every reward = a verified event:** single-use tyre QR, dealer-bound codes.",
   "**Lift Engine:** pilot vs matched control districts (diff-in-diff).",
-  "**Influence Graph · Fraud Guard · Nudge Engine · Budget Autopilot · mystery-rider audits.**",
-  "**Command Centre** shows funnel, lift & fraud live.",
-], 7.23, yC + 0.42, 2.42, hC - 0.45, { size: 7.7 });
+  "**Influence Graph · Fraud Guard · Nudge Engine · Autopilot.**",
+  "**Mystery-rider audits** measure the recommendation itself.",
+], 7.23, yC + 0.85, 2.42, 1.0, { size: 7.1, para: 1.5 });
 
 // 11 Tech, budget & rollout
 card(9.8, yC, 3.3, hC, "F3F6FB");
-head(9.92, yC + 0.07, 3.15, "11", "Tech, budget & rollout", "1E3A8A");
-body([
-  "**Stack:** Next.js 15 · React 19 · Three.js · GSAP · FastAPI · SQLModel · Postgres-ready · Render + Vercel.",
-  "**Architecture:** WhatsApp & web channels → API → scoring, fraud, nudge & lift services → data.",
-], 9.88, yC + 0.42, 3.17, 0.66, { size: 7.3, para: 1.5 });
+head(9.92, yC + 0.07, 3.15, "11", "Tech, architecture, budget, rollout", "1E3A8A");
+const chips = [["WhatsApp\n+ Web", "DCFCE7"], ["Next.js 15\nThree.js", "FFEDD5"], ["FastAPI\n45 APIs", "FEF3C7"], ["Score·Fraud\nNudge·Lift", "E0E7FF"], ["SQLModel\nPostgres", "F1F5F9"]];
+chips.forEach(([t, f], i) => {
+  const x = 9.9 + i * 0.63;
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: yC + 0.42, w: 0.54, h: 0.4, fill: { color: f }, line: { color: "C7CEDB", width: 0.5 }, rectRadius: 0.04 });
+  s.addText(t, { x, y: yC + 0.42, w: 0.54, h: 0.4, fontFace: BODY, fontSize: 6, bold: true, color: INK, align: "center", valign: "middle", margin: 0, isTextBox: true });
+  if (i < 4) s.addText("→", { x: x + 0.53, y: yC + 0.47, w: 0.11, h: 0.28, fontFace: BODY, fontSize: 8, bold: true, color: "64748B", align: "center", margin: 0, isTextBox: true });
+});
+s.addText("React 19 · GSAP · Lenis · Tailwind · Pydantic · pytest · deployed on Render + Vercel", { x: 9.9, y: yC + 0.85, w: 3.12, h: 0.16, fontFace: BODY, fontSize: 6.6, color: TXT, margin: 0, isTextBox: true });
 const mix = [["Tools 40%", 40, "E8501A"], ["Visibility 22%", 22, "F59E0B"], ["Field 18%", 18, "0EA5E9"], ["Acad. 10", 10, "65A30D"], ["Tech 10", 10, "7C3AED"]];
 let bx = 9.9;
 mix.forEach(([n, v, c]) => {
   const w = 3.1 * v / 100;
-  s.addShape(pres.shapes.RECTANGLE, { x: bx, y: yC + 1.1, w, h: 0.24, fill: { color: c }, line: { color: "FFFFFF", width: 0.75 } });
-  s.addText(n, { x: bx, y: yC + 1.1, w, h: 0.24, fontFace: BODY, fontSize: 6.3, bold: true, color: "FFFFFF", align: "center", valign: "middle", margin: 0, isTextBox: true });
+  s.addShape(pres.shapes.RECTANGLE, { x: bx, y: yC + 1.05, w, h: 0.22, fill: { color: c }, line: { color: "FFFFFF", width: 0.75 } });
+  s.addText(n, { x: bx, y: yC + 1.05, w, h: 0.22, fontFace: BODY, fontSize: 6.2, bold: true, color: "FFFFFF", align: "center", valign: "middle", margin: 0, isTextBox: true });
   bx += w;
 });
-body(["**Rollout:** design M0–2 → pilot M2–6 → 120 districts by M12 → 600+ by M24. Scale only if lift ≥ +1.5 pp, fraud < 2%."],
-  9.88, yC + 1.39, 3.17, 0.46, { size: 7.3, para: 0 });
+[["Design", "M0–2", "64748B"], ["Pilot", "M2–6", "E8501A"], ["Scale", "M7–12", "0EA5E9"], ["National", "M12–24", "65A30D"]].forEach(([n, t, c], i) => {
+  const x = 9.88 + i * 0.79;
+  s.addShape(pres.shapes.CHEVRON, { x, y: yC + 1.33, w: 0.82, h: 0.3, fill: { color: c }, line: { color: c } });
+  s.addText([{ text: n + " ", options: { bold: true } }, { text: t }], { x: x + 0.1, y: yC + 1.33, w: 0.62, h: 0.3, fontFace: BODY, fontSize: 5.6, color: "FFFFFF", align: "center", valign: "middle", margin: 0, isTextBox: true });
+});
+s.addText("Scale gate: lift ≥ +1.5 pp · fraud < 2% · ≤ ₹350 per extra tyre", { x: 9.9, y: yC + 1.66, w: 3.12, h: 0.16, fontFace: BODY, fontSize: 6.6, bold: true, color: INK, align: "center", margin: 0, isTextBox: true });
 
 s.addText("All pilot, district and financial figures come from our rollout simulator and simulated pilot dataset (assumptions in the report), not Eurogrip data.",
   { x: 0.2, y: 7.33, w: 12.9, h: 0.14, fontFace: BODY, fontSize: 6.5, italic: true, color: MUTED, align: "center", margin: 0, isTextBox: true });
