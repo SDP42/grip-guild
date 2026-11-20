@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { BookOpen, Boxes, Flame, Fingerprint, MessageCircle, Repeat, ScanLine, Share2, Star, Wrench } from "lucide-react";
+import { BookOpen, Boxes, Flame, Fingerprint, MessageCircle, Repeat, ScanLine, Share2, Star, Trophy, Users, Wrench } from "lucide-react";
 import { useMe } from "@/components/app/MeContext";
 import ScoreRing from "@/components/app/ScoreRing";
+import CoachDeck from "@/components/app/CoachDeck";
 import CountUp from "@/components/CountUp";
 import { TIER_COLORS } from "@/lib/types";
 
 const QUICK = [
+  { href: "/app/quests", icon: Trophy, label: "Quests", c: "#A78BFA" },
+  { href: "/app/circle", icon: Users, label: "My Circle", c: "#38BDF8" },
   { href: "/app/scan", icon: ScanLine, label: "Scan fitment", c: "#FF5A1F" },
   { href: "/app/refer", icon: Share2, label: "Refer rider", c: "#C6FF3D" },
   { href: "/app/treadlens", icon: Star, label: "TreadLens", c: "#38BDF8" },
@@ -17,6 +20,8 @@ const QUICK = [
   { href: "/app/academy", icon: BookOpen, label: "Academy", c: "#A78BFA" },
   { href: "/app/passport", icon: Fingerprint, label: "Passport", c: "#C6FF3D" },
   { href: "/app/bot", icon: MessageCircle, label: "Guild Bot", c: "#25D366" },
+  { href: "/app/inbox", icon: Repeat, label: "Boomerang", c: "#C6FF3D" },
+  { href: `/board`, icon: Star, label: "My Board", c: "#FFB020" },
 ];
 
 function Skeleton() {
@@ -24,7 +29,7 @@ function Skeleton() {
 }
 
 export default function AppHome() {
-  const { me } = useMe();
+  const { me, inbox } = useMe();
   if (!me) return <Skeleton />;
   const m = me.mechanic;
   const tc = TIER_COLORS[m.tier];
@@ -42,6 +47,15 @@ export default function AppHome() {
           <span className="h-2 w-2 rounded-full" style={{ background: tc }} /> {m.tier}
         </span>
       </header>
+
+      <CoachDeck />
+
+      {inbox && inbox.sos.some((x) => x.status === "requested") && (
+        <Link href="/app/inbox" className="flex items-center gap-3 rounded-2xl border border-rose/40 bg-rose/15 p-3 text-sm">
+          <span className="relative flex h-3 w-3"><span className="absolute inline-flex h-full w-full animate-pulseRing rounded-full bg-rose" /><span className="relative h-3 w-3 rounded-full bg-rose" /></span>
+          <b>Live SOS lead</b> — a rider near you has a flat tyre. Tap to accept.
+        </Link>
+      )}
 
       {/* Score + wallet */}
       <section className="card relative overflow-hidden p-5">
@@ -96,7 +110,7 @@ export default function AppHome() {
       <section className="grid grid-cols-4 gap-2">
         {QUICK.map((q, i) => (
           <motion.div key={q.href} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.05 * i }}>
-            <Link href={q.href} className="flex flex-col items-center gap-1.5 rounded-2xl bg-ink-800 p-3 text-center text-[10px] text-bone-dim active:scale-95">
+            <Link href={q.href === "/board" ? `/board/${m.id}` : q.href} className="flex flex-col items-center gap-1.5 rounded-2xl bg-ink-800 p-3 text-center text-[10px] text-bone-dim active:scale-95">
               <span className="grid h-10 w-10 place-items-center rounded-xl" style={{ background: `${q.c}1f` }}>
                 <q.icon className="h-5 w-5" style={{ color: q.c }} />
               </span>
@@ -122,17 +136,17 @@ export default function AppHome() {
 
       {/* Boomerang + Circle */}
       <section className="grid grid-cols-2 gap-2">
-        <div className="rounded-2xl border border-volt/20 bg-volt/[0.06] p-4">
+        <Link href="/app/inbox" className="rounded-2xl border border-volt/20 bg-volt/[0.06] p-4">
           <Repeat className="h-5 w-5 text-volt" />
           <p className="mt-2 font-display text-2xl font-black">{me.boomerang_upcoming}</p>
           <p className="text-[11px] text-bone-dim">riders due back to you in 120 days (Customer Boomerang)</p>
-        </div>
+        </Link>
         {me.circle && (
-          <div className="rounded-2xl border border-sky/20 bg-sky/[0.06] p-4">
+          <Link href="/app/circle" className="rounded-2xl border border-sky/20 bg-sky/[0.06] p-4">
             <p className="text-[11px] font-semibold text-sky">{me.circle.name}</p>
             <p className="mt-2 font-display text-2xl font-black">{Math.round((100 * me.circle.progress_fitments) / me.circle.goal_fitments)}%</p>
             <p className="text-[11px] text-bone-dim">to unlock a shared {me.circle.unlock_reward}</p>
-          </div>
+          </Link>
         )}
       </section>
 
