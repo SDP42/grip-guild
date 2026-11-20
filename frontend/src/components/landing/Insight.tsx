@@ -48,19 +48,19 @@ export default function Insight() {
     <section id="insight" ref={root} className="relative h-screen overflow-hidden">
       <div className="tread-bg absolute inset-0 opacity-60" />
       <div className="relative flex h-full flex-col justify-center">
-        <div className="mx-auto mb-10 w-full max-w-7xl px-4 sm:px-6">
+        <div className="mx-auto mb-6 w-full max-w-7xl px-4 sm:mb-10 sm:px-6">
           <p className="eyebrow"><Scramble text="The brief, decoded" /></p>
           <h2 className="h-display mt-3 text-4xl sm:text-6xl">Five insights. <span className="text-stroke">One design.</span></h2>
         </div>
         <div ref={track} className="flex w-max gap-6 px-4 sm:px-6 lg:pl-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))]">
           {CARDS.map((c) => (
-            <article key={c.k} className="insight-card card relative flex h-[58vh] max-h-[460px] w-[82vw] max-w-[420px] flex-col justify-between overflow-hidden p-7">
+            <article key={c.k} className="insight-card card relative flex h-[56vh] max-h-[460px] w-[80vw] max-w-[420px] flex-col justify-between overflow-hidden p-5 sm:p-7">
               <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-molten/20 blur-3xl" />
               <div>
                 <div className="flex items-center justify-between font-mono text-xs text-bone-mute">
-                  <span>INSIGHT {c.k}</span><span>Eurogrip mechanic brand-track</span>
+                  <span>INSIGHT {c.k}</span><span className="hidden sm:inline">Eurogrip mechanic brand-track</span>
                 </div>
-                <p className="h-display mt-6 text-5xl text-bone">{c.big}</p>
+                <p className="h-display mt-5 text-[2.1rem] leading-none text-bone sm:mt-6 sm:text-5xl">{c.big}</p>
                 <p className="mt-4 text-lg font-medium text-bone">{c.title}</p>
               </div>
               <div className="border-t border-white/10 pt-5">
