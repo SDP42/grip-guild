@@ -342,13 +342,15 @@ def seed(force: bool = False) -> None:
                              status=R.choices(["fitted", "delivered", "dispatched", "placed"], [60, 15, 15, 10])[0],
                              created_at=NOW - timedelta(hours=R.randint(1, 900)), eta_hours=dl.ghost_shelf_sla_hours))
         fits = s.exec(select(Fitment)).all()
-        for f in R.sample(fits, 500):
+        for f in R.sample([x for x in fits if (NOW - x.created_at).days > 45], 500):
             depth = R.uniform(4.5, 6.0)
             for k in range(R.randint(1, 4)):
+                if f.created_at + timedelta(days=30 * (k + 1)) > NOW:
+                    break
                 depth -= R.uniform(0.4, 1.1)
                 s.add(TreadCheck(serial=f.serial, mechanic_id=f.mechanic_id, tread_mm=round(max(1.0, depth), 1),
                                  psi=R.randint(22, 32), score=R.randint(30, 95),
-                                 created_at=f.created_at + timedelta(days=60 * (k + 1))))
+                                 created_at=f.created_at + timedelta(days=30 * (k + 1))))
         for name, city, riders, plan in [("SwiftDrop Logistics", "Pune", 820, "Pro"), ("CityBite Riders", "Bengaluru", 1450, "Pro"),
                                          ("QuickKart Fleet", "Chennai", 610, "Basic"), ("ParcelPro", "Lucknow", 380, "Basic"),
                                          ("MetroMeals Delivery", "Hyderabad", 990, "Pro")]:
