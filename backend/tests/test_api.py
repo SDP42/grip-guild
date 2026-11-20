@@ -47,3 +47,26 @@ def test_bot_and_engines():
         q = c.post("/api/academy/tubeless-101/submit", json={"mechanic_id": mid, "answers": [1, 0, 1]}).json()
         assert q["passed"]
         assert c.get(f"/api/verify/{q['verify_code']}").json()["valid"]
+
+
+def test_personas_and_ecosystem():
+    with client() as c:
+        ps = c.get("/api/personas").json()
+        assert {p["slug"] for p in ps} >= {"ravi", "gurpreet", "imran", "lakshmi", "priya", "dealer", "anita", "brand"}
+        for slug in ["ravi", "gurpreet", "imran", "lakshmi"]:
+            me = c.get(f"/api/mechanics/me?persona={slug}").json()
+            assert me["mechanic"]["persona"] == slug and me["quests"]
+        serial = c.get("/api/rider/sample-serial").json()["serial"]
+        twin = c.get(f"/api/rider/tyre/{serial}").json()
+        assert twin["genuine"] and len(twin["history"]) >= 3
+        assert not c.get("/api/rider/tyre/EGFAKE000000").json()["genuine"]
+        assert c.get("/api/fleets").json()
+        q = c.get("/api/dealer/1/queue").json()
+        assert "referrals" in q and "orders" in q
+        mid = c.get("/api/mechanics/me").json()["mechanic"]["id"]
+        o = c.post("/api/ghost-orders", json={"mechanic_id": mid, "tyre_model": "Protorq Extreme", "size": "90/90-17"}).json()
+        assert c.post(f"/api/ghost-orders/{o['id']}/advance").json()["status"] == "dispatched"
+        assert c.get("/api/field/nudges").json()["items"]
+        assert c.post("/api/rider/rate", json={"mechanic_id": mid, "stars": 5}).json()["ok"]
+        auto = c.get("/api/analytics/autopilot").json()
+        assert abs(sum(x["next_lakh"] for x in auto) - 60) < 0.5
