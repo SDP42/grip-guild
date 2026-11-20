@@ -84,7 +84,7 @@ body([
   "**Status matters:** demand for boards & uniforms is rising fast.",
   "**Non-stockers already advocate,** yet nothing rewards it.",
   "**Blind spot:** no data on who rides Eurogrip tyres.",
-  "**Scale:** lakhs of fragmented, low-digital shops; field teams can't visit all.",
+  "**Scale:** fragmented, low-digital shops nationwide.",
 ], 0.3, yA + 0.42, 2.9, hA - 0.46, { size: 7.8, para: 2 });
 
 // 2 Who it's for
