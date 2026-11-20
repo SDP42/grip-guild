@@ -65,7 +65,7 @@ function control() {
     new Paragraph({ children: [run("Contents", { bold: true, size: 30, color: C.ink })], spacing: { after: 80 } }),
     ...tocTable(),
     spacer(140),
-    new Paragraph({ children: [run("The solution on one page", { bold: true, size: 30, color: C.ink })], spacing: { after: 80 } }),
+    new Paragraph({ pageBreakBefore: true, children: [run("The solution on one page", { bold: true, size: 30, color: C.ink })], spacing: { after: 80 } }),
     table([
       ["Problem", "Solution", "Impact"],
       ["Mechanics decide most two-wheeler tyre replacements, but Eurogrip awareness among them is lukewarm, stocking lags competitors and recommendations rarely favour the brand.",
