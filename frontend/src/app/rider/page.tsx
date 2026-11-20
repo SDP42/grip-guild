@@ -17,7 +17,9 @@ const TIER_C: Record<string, string> = { Apprentice: "#9CA3AF", Craftsman: "#38B
 export default function Rider() {
   const [shops, setShops] = useState<Shop[] | null>(null);
   const [pick, setPick] = useState<number | null>(null);
-  const [stage, setStage] = useState<"idle" | "searching" | "found" | "enroute" | "fixed" | "rated">("idle");
+  const [stage, setStage] = useState<"idle" | "searching" | "found" | "waiting" | "enroute" | "fixed" | "rated">("idle");
+  const [sosId, setSosId] = useState<number | null>(null);
+  const [msgs, setMsgs] = useState<{ kind: string; from: string; at: string; text: string; link: string }[]>([]);
   const [stars, setStars] = useState(5);
   const [fleet, setFleet] = useState<Fleet | null>(null);
   const [serial, setSerial] = useState("");
@@ -25,7 +27,32 @@ export default function Rider() {
   useEffect(() => {
     api<Fleet[]>("/api/fleets").then((f) => setFleet(f.find((x) => x.city === "Pune") ?? f[0])).catch(() => {});
     api<{ serial: string }>("/api/rider/sample-serial").then((r) => setSerial(r.serial)).catch(() => {});
+    const load = () => api<typeof msgs>("/api/rider/messages?name=Priya").then(setMsgs).catch(() => {});
+    load();
+    const t = setInterval(load, 5000);
+    return () => clearInterval(t);
   }, []);
+
+  // Poll the SOS so the mechanic's accept / done buttons show up here live.
+  useEffect(() => {
+    if (!sosId || stage === "fixed" || stage === "rated") return;
+    const t = setInterval(async () => {
+      const r = await api<{ status: string }>(`/api/sos/${sosId}`);
+      if (r.status === "accepted") setStage("enroute");
+      if (r.status === "fixed") setStage("fixed");
+    }, 2500);
+    return () => clearInterval(t);
+  }, [sosId, stage]);
+
+  async function request() {
+    if (!pick) return;
+    const r = await post<{ id: number }>("/api/sos/request", { mechanic_id: pick, ...HOME, rider_name: "Priya" });
+    setSosId(r.id); setStage("waiting");
+  }
+  async function markFixed() {
+    if (sosId) await post(`/api/sos/${sosId}/fixed`, {}).catch(() => {});
+    setStage("fixed");
+  }
 
   async function sos() {
     setStage("searching"); setPick(null);
@@ -89,11 +116,17 @@ export default function Rider() {
                     <div className="text-right text-xs"><p className="font-mono">{s.km} km</p><p className="text-bone-mute">{s.eta_min} min</p></div>
                   </button>
                 ))}
-                {stage === "found" && <button onClick={() => setStage("enroute")} className="btn-primary w-full py-3">Call {chosen?.name.split(" ")[0]} — Pit Pass priority</button>}
+                {stage === "found" && <button onClick={request} className="btn-primary w-full py-3">Send SOS to {chosen?.name.split(" ")[0]} — Pit Pass priority</button>}
+                {stage === "waiting" && (
+                  <div className="rounded-2xl bg-amber/10 p-4 text-sm">
+                    <p className="flex items-center gap-2 font-semibold"><span className="h-2 w-2 animate-ping rounded-full bg-amber" /> Waiting for {chosen?.shop} to accept…</p>
+                    <p className="mt-1 text-xs text-bone-dim">The lead is now in the mechanic&apos;s app. Try it: open <a href={`/app?persona=ravi`} target="_blank" className="text-molten underline">Ravi&apos;s app</a> → Inbox → Accept.</p>
+                  </div>
+                )}
                 {stage === "enroute" && (
                   <div className="rounded-2xl bg-volt/10 p-4 text-sm">
                     <p className="flex items-center gap-2 font-semibold"><Clock className="h-4 w-4" /> {chosen?.name} is on the way · ETA {chosen?.eta_min} min</p>
-                    <button onClick={() => setStage("fixed")} className="btn-ghost mt-3 w-full">Mark as fixed</button>
+                    <button onClick={markFixed} className="btn-ghost mt-3 w-full">Mark as fixed</button>
                   </div>
                 )}
                 {stage === "fixed" && (
@@ -105,7 +138,7 @@ export default function Rider() {
                     <button onClick={rate} className="btn-primary mt-3 w-full">Submit rating</button>
                   </div>
                 )}
-                {stage === "rated" && <p className="rounded-2xl bg-volt/10 p-4 text-sm">⭐ Thanks! Your rating now shows on the shop&apos;s Living Shop Board and feeds its Guild Score.</p>}
+                {stage === "rated" && <p className="rounded-2xl bg-volt/10 p-4 text-sm">⭐ Thanks! Your rating is live on the <a href={`/board/${chosen?.id}`} className="underline">shop&apos;s Living Shop Board</a> and feeds its Guild Score.</p>}
               </motion.div>
             )}
           </AnimatePresence>
@@ -137,12 +170,22 @@ export default function Rider() {
           </section>
 
           <section className="card p-5">
-            <p className="flex items-center gap-2 font-semibold"><Bike className="h-5 w-5 text-molten" /> WhatsApp from Sai Puncture Works</p>
-            <div className="mt-3 rounded-2xl rounded-tl-sm bg-[#202C33] p-3 text-sm">
-              Hi Priya 👋 Your rear tyre was fitted 14 months ago and TreadLens showed 2.3 mm last time. Drop by for a free check this week — 10% off Eurogrip if it needs replacing.
-              <p className="mt-1 text-right text-[10px] text-bone/50">Customer Boomerang · automated</p>
+            <p className="flex items-center gap-2 font-semibold"><Bike className="h-5 w-5 text-molten" /> Priya&apos;s WhatsApp from Guild shops</p>
+            <div className="mt-3 space-y-2">
+              {msgs.length === 0 && (
+                <p className="rounded-2xl bg-ink-700 p-3 text-xs text-bone-dim">
+                  Nothing yet. In <a href="/app?persona=ravi" target="_blank" className="text-molten underline">Ravi&apos;s app</a>, save a TreadLens card for &quot;Priya&quot; or send her a Boomerang reminder from the Inbox. It lands here.
+                </p>
+              )}
+              {msgs.map((m, i) => (
+                <a key={i} href={m.link} className="block rounded-2xl rounded-tl-sm bg-[#202C33] p-3 text-sm">
+                  <p className="text-[11px] font-semibold text-[#25D366]">{m.from}</p>
+                  {m.text}
+                  <p className="mt-1 text-right text-[10px] text-bone/50">{m.kind === "card" ? "Tyre health card" : "Customer Boomerang"} · {new Date(m.at).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
+                </a>
+              ))}
             </div>
-            <p className="mt-3 flex items-center gap-1.5 text-xs text-bone-dim"><BadgeCheck className="h-4 w-4 text-amber" /> The reminder sends the rider back to the same mechanic, not to a competitor.</p>
+            <p className="mt-3 flex items-center gap-1.5 text-xs text-bone-dim"><BadgeCheck className="h-4 w-4 text-amber" /> Reminders send the rider back to the same mechanic, not to a competitor.</p>
           </section>
         </div>
       </div>
