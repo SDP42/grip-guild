@@ -98,6 +98,8 @@ class Fitment(SQLModel, table=True):
     channel: str  # "stock" | "ghost_shelf" | "referral"
     created_at: datetime
     reminder_due_at: datetime  # Customer Boomerang
+    reminder_sent_at: Optional[datetime] = None
+    rider_name: str = "Rider"
 
 
 class Referral(SQLModel, table=True):
@@ -153,8 +155,11 @@ class SOSRequest(SQLModel, table=True):
     mechanic_id: int = Field(foreign_key="mechanic.id")
     distance_km: float
     eta_min: int
-    status: str  # routed | fixed
+    status: str  # requested | accepted | fixed | routed
     created_at: datetime
+    rider_name: str = "Rider"
+    accepted_at: Optional[datetime] = None
+    fixed_at: Optional[datetime] = None
 
 
 class GhostOrder(SQLModel, table=True):
@@ -180,6 +185,9 @@ class TreadCheck(SQLModel, table=True):
     psi: float
     score: int
     created_at: datetime
+    pattern: str = "even"
+    verdict: str = ""
+    rider_name: str = ""
 
 
 class FleetAccount(SQLModel, table=True):
@@ -211,3 +219,34 @@ class FieldVisit(SQLModel, table=True):
     status: str  # planned | done
     scheduled_for: datetime
     notes: str = ""
+
+
+class Notification(SQLModel, table=True):
+    """Cross-persona event feed: what reaches a mechanic's inbox."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    mechanic_id: int = Field(foreign_key="mechanic.id", index=True)
+    kind: str  # sos | referral | order | rating | quest | tier | credit | system
+    title: str
+    body: str
+    link: str = ""
+    created_at: datetime
+    read: bool = False
+
+
+class QuestClaim(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    mechanic_id: int = Field(foreign_key="mechanic.id")
+    quest_slug: str
+    points: int
+    claimed_at: datetime
+
+
+class CreditApplication(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    mechanic_id: int = Field(foreign_key="mechanic.id")
+    amount_inr: int
+    purpose: str
+    status: str  # approved | review | declined
+    emi_inr: int
+    created_at: datetime

@@ -7,6 +7,9 @@ DB_PATH = Path(os.getenv("GRIP_DB", Path(__file__).resolve().parent.parent / "gr
 engine = create_engine(f"sqlite:///{DB_PATH}", connect_args={"check_same_thread": False})
 
 
+SCHEMA_VERSION = "3"
+
+
 def init_db() -> None:
     from . import models  # noqa: F401  (register tables)
 

@@ -22,6 +22,7 @@ from .models import (
     FraudAlert,
     Mechanic,
     Module,
+    Notification,
     Referral,
     SOSRequest,
     Tool,
@@ -158,8 +159,11 @@ def _mask() -> str:
 
 
 def seed(force: bool = False) -> None:
-    from .db import init_db
+    from .db import DB_PATH, SCHEMA_VERSION, init_db
 
+    marker = DB_PATH.with_suffix(".schema")
+    if not marker.exists() or marker.read_text() != SCHEMA_VERSION:
+        force = True  # schema changed since the DB was created → rebuild demo data
     if force:
         SQLModel.metadata.drop_all(engine)
     init_db()
@@ -369,6 +373,17 @@ def seed(force: bool = False) -> None:
                              status=R.choice(["planned", "done"]),
                              scheduled_for=NOW + timedelta(hours=R.randint(-72, 72))))
         s.commit()
+
+        # Name riders on fitments and seed a welcome inbox for each persona
+        riders = ["Priya", "Arjun", "Neha", "Rohit", "Fatima", "Karan", "Sneha", "Vikas", "Divya", "Amit", "Pooja", "Rahul"]
+        for f in s.exec(select(Fitment)).all():
+            f.rider_name = R.choice(riders)
+            s.add(f)
+        for pm, spec in persona_rows.values():
+            s.add(Notification(mechanic_id=pm.id, kind="system", title="Welcome to Grip Guild",
+                               body="Your Guild Coach has today's plan ready.", link="/app", created_at=NOW - timedelta(hours=3)))
+        s.commit()
+    marker.write_text(SCHEMA_VERSION)
 
 
 if __name__ == "__main__":
