@@ -50,14 +50,14 @@ export default function Hero() {
     <section ref={root} className="relative h-[320vh]">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         <div className="absolute inset-0"><HeroScene /></div>
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_50%,transparent_20%,#07080A_85%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#07080A_0%,rgba(7,8,10,.85)_30%,transparent_62%)]" />
 
         <div className="hero-copy absolute inset-0 mx-auto flex max-w-7xl flex-col justify-center px-4 sm:px-6">
           <span className="chip mb-6 w-fit">
             <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-pulseRing rounded-full bg-volt" /><span className="relative h-2 w-2 rounded-full bg-volt" /></span>
             Eurogrip TORQ 4.0 · Case Study 4
           </span>
-          <h1 className="h-display max-w-3xl text-[13vw] sm:text-7xl lg:text-8xl">
+          <h1 className="h-display max-w-2xl text-[12vw] sm:text-6xl lg:text-7xl">
             Mechanics don&apos;t need cash.
             <br />
             <span className="gradient-molten">They need a Guild.</span>
