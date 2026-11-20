@@ -10,6 +10,7 @@ import Flow from "@/components/landing/Flow";
 import Impact from "@/components/landing/Impact";
 import Finale from "@/components/landing/Finale";
 import Personas from "@/components/landing/Personas";
+import TwinSection from "@/components/landing/TwinSection";
 
 export default function Home() {
   return (
@@ -22,6 +23,7 @@ export default function Home() {
         <Pillars />
         <Personas />
         <Features />
+        <TwinSection />
         <Tiers />
         <Flow />
         <Impact />
