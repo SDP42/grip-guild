@@ -20,10 +20,19 @@ export default function Dealer() {
   const [q, setQ] = useState<Queue | null>(null);
   const [code, setCode] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
-  const [dealerId, setDealerId] = useState(1);
+  const [dealerId, setDealerId] = useState<number | null>(null);
+  const [all, setAll] = useState<{ id: number; name: string; district: string }[]>([]);
 
-  const load = useCallback(() => api<Queue>(`/api/dealer/${dealerId}/queue`).then(setQ), [dealerId]);
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    api<{ id: number }>("/api/dealer/persona").then((d) => setDealerId(d.id));
+    api<{ id: number; name: string; district: string }[]>("/api/dealers").then(setAll);
+  }, []);
+  const load = useCallback(() => { if (dealerId) api<Queue>(`/api/dealer/${dealerId}/queue`).then(setQ); }, [dealerId]);
+  useEffect(() => {
+    load();
+    const t = setInterval(load, 5000); // new codes and Ghost Shelf orders appear live
+    return () => clearInterval(t);
+  }, [load]);
 
   async function redeem(c: string) {
     try {
@@ -35,12 +44,14 @@ export default function Dealer() {
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-6 sm:px-6">
-      <PersonaHeader initials="BT" color="#A78BFA" kind="Dealer" name={q?.dealer.name ?? "Dealer"} sub={`Eurogrip dealer · Ghost Shelf SLA ${q?.dealer.ghost_shelf_sla_hours ?? "–"} h · switch dealer below`} />
+      <PersonaHeader initials="BT" color="#A78BFA" kind="Dealer" name={q?.dealer.name ?? "Dealer"} sub={`Eurogrip dealer serving Sai Puncture Works · Ghost Shelf SLA ${q?.dealer.ghost_shelf_sla_hours ?? "–"} h`} />
 
-      <div className="mt-4 flex items-center gap-2 text-xs text-bone-dim">
-        Dealer #
-        {[1, 2, 3, 4].map((n) => <button key={n} onClick={() => setDealerId(n)} className={`chip ${dealerId === n ? "!border-[#A78BFA] !text-[#A78BFA]" : ""}`}>{n}</button>)}
-      </div>
+      <label className="mt-4 flex flex-wrap items-center gap-2 text-xs text-bone-dim">
+        Viewing dealer
+        <select value={dealerId ?? ""} onChange={(e) => setDealerId(+e.target.value)} className="rounded-lg border border-white/10 bg-ink-800 px-2 py-1.5 text-bone">
+          {all.map((d) => <option key={d.id} value={d.id}>{d.name} · {d.district}</option>)}
+        </select>
+      </label>
 
       {q && (
         <>
