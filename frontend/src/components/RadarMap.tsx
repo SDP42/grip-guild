@@ -37,8 +37,8 @@ export default function RadarMap({ center, points, selected, onSelect, radiusKm 
         {points.map((p) => {
           const { x, y } = proj(p);
           return selected === p.id ? (
-            <motion.line key={`l${p.id}`} x1="50" y1="50" x2={x} y2={y} stroke="#C6FF3D" strokeWidth=".6" strokeDasharray="1.5 1.5"
-              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} />
+            <motion.path key={`l${p.id}`} d={`M50 50 L${x} ${y}`} stroke="#C6FF3D" strokeWidth=".6" fill="none"
+              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.8 }} />
           ) : null;
         })}
       </svg>
