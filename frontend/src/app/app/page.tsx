@@ -37,7 +37,7 @@ export default function AppHome() {
 
   return (
     <div className="space-y-4 px-4 pb-6 pt-4">
-      <header className="flex items-center justify-between">
+      <header className="flex items-center justify-between pr-12">
         <div>
           <p className="text-xs text-bone-mute">Welcome back</p>
           <h1 className="font-display text-xl font-bold">{m.name.split(" ")[0]}</h1>
