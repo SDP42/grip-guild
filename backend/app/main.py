@@ -28,6 +28,11 @@ for r in (personas.router, mechanics.router, advocacy.router, analytics.router, 
     app.include_router(r)
 
 
+@app.api_route("/", methods=["GET", "HEAD"], include_in_schema=False)
+def root():
+    return {"service": "grip-guild", "docs": "/docs", "health": "/api/health"}
+
+
 @app.get("/api/health")
 def health():
     return {"status": "ok", "service": "grip-guild"}
