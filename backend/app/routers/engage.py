@@ -51,12 +51,72 @@ QUIZ = {
     "tubeless-101": [
         {"q": "Best permanent fix for a tread puncture on a tubeless tyre?",
          "options": ["Plug from outside only", "Patch-plug from inside", "Tube inside", "Sealant only"], "a": 1},
-        {"q": "Maximum puncture size usually repairable on a 2W tread?",
+        {"q": "Largest puncture usually repairable on a two-wheeler tread?",
          "options": ["6 mm", "15 mm", "Any size", "Sidewall cuts too"], "a": 0},
-        {"q": "After repair you should always…",
-         "options": ["Skip leak test", "Leak test with soapy water", "Over-inflate 10 psi", "Fit a tube"], "a": 1},
+        {"q": "After a repair you should always…",
+         "options": ["Skip the leak test", "Leak test with soapy water", "Over-inflate by 10 psi", "Fit a tube"], "a": 1},
+    ],
+    "ev-tyres": [
+        {"q": "Why do EV scooter rear tyres wear faster?",
+         "options": ["Instant motor torque", "Lighter batteries", "Lower speeds", "No engine heat"], "a": 0},
+        {"q": "What matters most when picking an EV tyre?",
+         "options": ["Colour", "Load rating and rolling resistance", "Tread depth only", "Brand of rim"], "a": 1},
+        {"q": "Which tyre issue do EV riders notice more than petrol riders?",
+         "options": ["Road noise", "Exhaust smell", "Chain slack", "Clutch wear"], "a": 0},
+    ],
+    "treadlens": [
+        {"q": "Wear in the centre of the tread usually means…",
+         "options": ["Under-inflation", "Over-inflation", "Misalignment", "New tyre"], "a": 1},
+        {"q": "Wear on both edges usually means…",
+         "options": ["Under-inflation", "Over-inflation", "Perfect pressure", "Wrong rim"], "a": 0},
+        {"q": "A common legal minimum tread depth is…",
+         "options": ["0.5 mm", "1.6 mm", "4 mm", "6 mm"], "a": 1},
+    ],
+    "safe-fit": [
+        {"q": "Before fitting a new tyre, always inspect…",
+         "options": ["The rim for cracks and dents", "The headlight", "The seat", "Fuel level"], "a": 0},
+        {"q": "Wheel nuts and axle bolts should be tightened…",
+         "options": ["As hard as possible", "To the specified torque", "By hand only", "Only next service"], "a": 1},
+        {"q": "Wobble at speed after fitting usually needs…",
+         "options": ["Wheel balancing", "More air", "A new chain", "Nothing"], "a": 0},
+    ],
+    "talk-to-riders": [
+        {"q": "The best way to show a rider their tyre is worn?",
+         "options": ["Say 'trust me'", "Show the TreadLens card and wear zones", "Quote the price first", "Skip it"], "a": 1},
+        {"q": "A rider says it's too expensive. You should…",
+         "options": ["Insist", "Explain safety and km left, offer options", "Refuse service", "Give up"], "a": 1},
+        {"q": "After the job, send the rider…",
+         "options": ["Nothing", "Their health card and next check date", "A random ad", "A bill only"], "a": 1},
+    ],
+    "monsoon-grip": [
+        {"q": "In the monsoon the most important tyre check is…",
+         "options": ["Tread depth for water clearance", "Tyre colour", "Valve cap colour", "Brand logo"], "a": 0},
+        {"q": "Low pressure in the rain causes…",
+         "options": ["Better grip", "Aquaplaning risk", "Faster charging", "Nothing"], "a": 1},
+        {"q": "A Monsoon Grip Drive check takes about…",
+         "options": ["20 seconds with TreadLens", "1 hour", "A full day", "A week"], "a": 0},
     ],
 }
+
+
+LESSONS = {
+    "tubeless-101": ["Find the puncture with soapy water", "Ream the hole and insert a patch-plug from inside",
+                     "Seat the bead, inflate to spec, leak test"],
+    "ev-tyres": ["Instant torque scrubs the rear tread", "Check the load index against battery weight",
+                 "Low rolling resistance extends range"],
+    "treadlens": ["Measure tread at three points", "Read the wear pattern", "Share the health card with the rider"],
+    "safe-fit": ["Inspect the rim", "Torque to spec", "Balance the wheel"],
+    "talk-to-riders": ["Show, don't tell", "Talk km left and safety, not price", "Book the next check"],
+    "monsoon-grip": ["Tread depth clears water", "Pressure prevents aquaplaning", "Run the seasonal quest"],
+}
+
+
+@router.get("/academy/{slug}/lesson")
+def lesson(slug: str, session: Session = Depends(get_session)):
+    mod = session.exec(select(Module).where(Module.slug == slug)).first()
+    if not mod:
+        raise HTTPException(404, "Unknown module")
+    return {**mod.model_dump(), "steps": LESSONS.get(slug, [])}
 
 
 @router.get("/academy/{slug}/quiz")
@@ -77,6 +137,9 @@ def submit_quiz(slug: str, body: QuizIn, session: Session = Depends(get_session)
     mod = session.exec(select(Module).where(Module.slug == slug)).first()
     if score < 66 or not mod:
         return {"passed": False, "score": score}
+    if session.exec(select(Certification).where(Certification.mechanic_id == body.mechanic_id,
+                                                Certification.module_id == mod.id)).first():
+        return {"passed": True, "score": score, "badge": mod.badge, "points": 0, "verify_code": None, "already": True}
     code = f"GC-{body.mechanic_id:04d}-{mod.id:02d}{datetime.now():%H%M}"
     session.add(Certification(mechanic_id=body.mechanic_id, module_id=mod.id, score=score, verify_code=code,
                               issued_at=datetime.now()))
