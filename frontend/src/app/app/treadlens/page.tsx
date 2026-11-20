@@ -22,16 +22,30 @@ function Slider({ label, value, min, max, step, unit, onChange }: { label: strin
 }
 
 export default function TreadLens() {
-  const { me } = useMe();
+  const { me, refresh } = useMe();
   const [tread, setTread] = useState(2.4);
   const [psi, setPsi] = useState(24);
   const [age, setAge] = useState(30);
   const [pattern, setPattern] = useState("edges");
   const [cracks, setCracks] = useState(false);
   const [res, setRes] = useState<Res | null>(null);
+  const [rider, setRider] = useState("Priya");
+  const [saved, setSaved] = useState<{ card_id: number; whatsapp: string } | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  async function saveAndShare() {
+    if (!me) return;
+    setSaving(true);
+    const r = await post<{ card_id: number; whatsapp: string }>("/api/treadlens/save", {
+      mechanic_id: me.mechanic.id, rider_name: rider || "Rider", tread_mm: tread, psi, recommended_psi: 29, age_months: age, pattern, cracks,
+    });
+    setSaved(r); setSaving(false); refresh();
+    window.open(r.whatsapp, "_blank", "noopener");
+  }
 
   useEffect(() => {
     const t = setTimeout(() => post<Res>("/api/treadlens", { tread_mm: tread, psi, recommended_psi: 29, age_months: age, pattern, cracks }).then(setRes), 150);
+    setSaved(null);
     return () => clearTimeout(t);
   }, [tread, psi, age, pattern, cracks]);
 
@@ -71,7 +85,20 @@ export default function TreadLens() {
           </div>
           <ul className="mt-4 space-y-1 text-sm">{res.findings.map((f) => <li key={f}>• {f}</li>)}</ul>
           {res.recommendation && <p className="mt-3 rounded-xl bg-ink/60 p-3 text-sm">Recommended: <b className="text-molten">{res.recommendation}</b> — fit at {me?.mechanic.shop_name}</p>}
-          <button className="btn-primary mt-4 w-full"><Share2 className="h-4 w-4" /> Send card to rider on WhatsApp</button>
+          <label className="mt-4 block text-xs text-bone-dim">Rider name
+            <input value={rider} onChange={(e) => setRider(e.target.value)} className="mt-1 w-full rounded-xl border border-white/10 bg-ink-800 px-3 py-2 text-sm text-bone outline-none focus:border-molten" />
+          </label>
+          {saved ? (
+            <div className="mt-3 space-y-2 text-sm">
+              <p className="rounded-xl bg-volt/10 p-3">✅ Saved to the tyre&apos;s Twin and counted toward your Monsoon quest.</p>
+              <div className="flex gap-2">
+                <a href={`/card/${saved.card_id}`} target="_blank" className="btn-ghost flex-1">View card</a>
+                <a href={saved.whatsapp} target="_blank" rel="noopener" className="btn flex-1 bg-[#25D366] text-ink">WhatsApp again</a>
+              </div>
+            </div>
+          ) : (
+            <button onClick={saveAndShare} disabled={saving} className="btn-primary mt-3 w-full"><Share2 className="h-4 w-4" /> {saving ? "Saving…" : "Save & send card on WhatsApp"}</button>
+          )}
         </motion.div>
       )}
     </div>
