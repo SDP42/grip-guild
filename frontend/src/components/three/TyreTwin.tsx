@@ -1,6 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
+import GLFallback, { useWebGL } from "./GLFallback";
 import { ContactShadows, Environment, Lightformer, OrbitControls } from "@react-three/drei";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -163,6 +164,9 @@ function TwinModel({ wear, pattern, exploded, heatmap, spin }: { wear: number; p
 
 export default function TyreTwin({ wear = 0.45, pattern = "edges", exploded = 0, heatmap = true, spin = true, controls = true }:
   { wear?: number; pattern?: WearPattern; exploded?: number; heatmap?: boolean; spin?: boolean; controls?: boolean }) {
+  const gl = useWebGL();
+  if (gl === false) return <GLFallback />;
+  if (gl === null) return null;
   return (
     <Canvas dpr={[1, 1.75]} camera={{ position: [0, 0.6, 7.2], fov: 40 }} shadows>
       <ambientLight intensity={0.45} />
