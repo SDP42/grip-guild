@@ -13,6 +13,7 @@ from ..models import (Dealer, District, FieldVisit, Fitment, FleetAccount, Ghost
 from ..seed import NOW
 from ..services.autopilot import reallocate
 from ..services.fraud import haversine_km
+from ..services.notify import notify
 from ..services.nudges import churn_risk
 
 router = APIRouter(prefix="/api", tags=["ecosystem"])
@@ -61,6 +62,7 @@ def rate(body: RatingIn, session: Session = Depends(get_session)):
     m.rating = round((m.rating * m.ratings_count + body.stars) / (m.ratings_count + 1), 2)
     m.ratings_count += 1
     session.add_all([m, RiderRating(mechanic_id=m.id, stars=body.stars, comment=body.comment, created_at=datetime.now())])
+    notify(session, m.id, "rating", f"New {body.stars}★ rating", body.comment or "A rider rated your shop.", f"/board/{m.id}")
     session.commit()
     return {"ok": True, "new_rating": m.rating, "ratings_count": m.ratings_count}
 
@@ -126,6 +128,10 @@ def advance(order_id: int, session: Session = Depends(get_session)):
     if not o or o.status not in NEXT:
         raise HTTPException(409, "Order cannot move forward")
     o.status = NEXT[o.status]
+    msg = {"dispatched": f"Your {o.tyre_model} {o.size} is on its way (ETA {o.eta_hours} h).",
+           "delivered": f"{o.tyre_model} {o.size} delivered to your shop. Fit it and scan the QR to earn 60 pts.",
+           "fitted": f"{o.tyre_model} marked fitted. Nice sale with zero inventory."}[o.status]
+    notify(session, o.mechanic_id, "order", f"Ghost Shelf order {o.status}", msg, "/app/shelf")
     session.add(o)
     session.commit()
     session.refresh(o)

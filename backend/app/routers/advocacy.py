@@ -9,6 +9,7 @@ from sqlmodel import Session, select
 from ..db import get_session
 from ..models import Dealer, Fitment, FraudAlert, Mechanic, Referral, Tool, ToolLease
 from ..services.fraud import check_scan, haversine_km
+from ..services.notify import notify
 from ..services.tiers import TIERS, tier_for, tier_rank
 
 router = APIRouter(prefix="/api", tags=["advocacy"])
@@ -102,6 +103,9 @@ def redeem(code: str, session: Session = Depends(get_session)):
     m = session.get(Mechanic, r.mechanic_id)
     session.add(r)
     extra = _credit(session, m, POINTS["referral"])
+    dealer = session.get(Dealer, r.dealer_id)
+    notify(session, m.id, "referral", f"Referral {r.code} redeemed: +{POINTS['referral']} pts",
+           f"Your rider bought {r.tyre_model} at {dealer.name}. Your word sold a Eurogrip.", "/app/refer")
     session.commit()
     return {"ok": True, "mechanic": m.shop_name, "points": POINTS["referral"], **extra}
 
