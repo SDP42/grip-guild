@@ -36,11 +36,13 @@ export default function TreadLens() {
   async function saveAndShare() {
     if (!me) return;
     setSaving(true);
-    const r = await post<{ card_id: number; whatsapp: string }>("/api/treadlens/save", {
+    const r = await post<{ card_id: number; whatsapp: string; share_text: string }>("/api/treadlens/save", {
       mechanic_id: me.mechanic.id, rider_name: rider || "Rider", tread_mm: tread, psi, recommended_psi: 29, age_months: age, pattern, cracks,
     });
-    setSaved(r); setSaving(false); refresh();
-    window.open(r.whatsapp, "_blank", "noopener");
+    const text = r.share_text.replace(`/card/${r.card_id}`, `${window.location.origin}/card/${r.card_id}`);
+    const wa = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    setSaved({ card_id: r.card_id, whatsapp: wa }); setSaving(false); refresh();
+    window.open(wa, "_blank", "noopener");
   }
 
   useEffect(() => {
