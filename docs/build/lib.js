@@ -35,7 +35,7 @@ function runs(text, o = {}) {
 
 const P = (text, o = {}) => new Paragraph({ children: runs(text, o), alignment: o.align ?? AlignmentType.JUSTIFIED, spacing: { after: o.after ?? 100, line: 264 } });
 const TOC_ENTRIES = [];
-const H1 = (text, o = {}) => { TOC_ENTRIES.push(text); return new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun({ text, font: FONT })], pageBreakBefore: !!o.newPage }); };
+const H1 = (text, o = {}) => { TOC_ENTRIES.push(text); return new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun({ text, font: FONT })], pageBreakBefore: o.newPage !== false }); };
 const H2 = (text) => new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun({ text, font: FONT })] });
 const H3 = (text) => new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun({ text, font: FONT })] });
 const bullet = (text, lvl = 0) => new Paragraph({ numbering: { reference: "bullets", level: lvl }, children: runs(text), spacing: { after: 40, line: 252 } });
