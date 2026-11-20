@@ -5,7 +5,7 @@ from sqlmodel import Session, func, select
 
 from ..db import get_session
 from ..models import (Certification, Circle, District, Fitment, FraudAlert, Mechanic, Module,
-                      Referral, RiderRating, Tool, ToolLease, TreadCheck)
+                      QuestClaim, Referral, RiderRating, Tool, ToolLease, TreadCheck)
 from ..services.quests import progress
 from ..seed import NOW
 from ..services.scoring import guild_score
@@ -110,12 +110,13 @@ def quest_progress(session: Session, m: Mechanic, fits, refs) -> list[dict]:
     checks = session.exec(select(func.count()).select_from(TreadCheck).where(
         TreadCheck.mechanic_id == m.id, TreadCheck.created_at > since)).one()
     ev = sum(1 for f in fits if f.vehicle in ("Ather 450X", "Ola S1"))
+    claimed = set(session.exec(select(QuestClaim.quest_slug).where(QuestClaim.mechanic_id == m.id)).all())
     return progress({
         "tread_checks": checks,
         "fitments": sum(1 for f in fits if f.created_at > since),
         "ev_fitments": ev,
         "redeemed": sum(1 for r in refs if r.status == "redeemed" and r.created_at > NOW - timedelta(days=30)),
-    })
+    }, claimed)
 
 
 def passport(m: Mechanic, score: dict, fitments: int) -> dict:

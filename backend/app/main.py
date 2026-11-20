@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import advocacy, analytics, ecosystem, engage, mechanics, personas
+from .routers import advocacy, analytics, ecosystem, engage, live, mechanics, personas
 from .seed import seed
 
 
@@ -21,7 +21,7 @@ app = FastAPI(
 )
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-for r in (personas.router, mechanics.router, advocacy.router, analytics.router, engage.router, ecosystem.router):
+for r in (personas.router, mechanics.router, advocacy.router, analytics.router, engage.router, ecosystem.router, live.router):
     app.include_router(r)
 
 
