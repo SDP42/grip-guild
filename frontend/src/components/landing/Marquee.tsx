@@ -1,6 +1,6 @@
 const WORDS = [
-  "हर उस्ताद का गिल्ड", "Tools not cash", "ಪ್ರತಿ ಮೆಕ್ಯಾನಿಕ್", "Customers not coupons", "ஒவ்வொரு மெக்கானிக்",
-  "Status not stickers", "প্রতিটি মিস্ত্রি", "Measured, not guessed", "ప్రతి మెకానిక్", "WhatsApp-first",
+  "Tools not cash", "Customers not coupons", "Status not stickers", "Measured, not guessed",
+  "Zero inventory selling", "Every tyre has a twin", "Built for the puncture shop", "Join the Guild",
 ];
 
 export default function Marquee() {

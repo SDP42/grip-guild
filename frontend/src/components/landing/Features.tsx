@@ -12,7 +12,7 @@ type F = { icon: LucideIcon; title: string; body: string; tag: string; span?: st
 
 const FEATURES: F[] = [
   { icon: MessageCircle, title: "Guild Bot on WhatsApp", tag: "Zero install",
-    body: "Scan, refer, check points and EMI in Hindi, Tamil, Telugu and more — on the app every mechanic already uses.",
+    body: "Scan, refer, check points and tool EMI on the chat app every mechanic already uses. No download, no training.",
     span: "lg:col-span-2 lg:row-span-2", accent: "#25D366" },
   { icon: Boxes, title: "Ghost Shelf", tag: "No inventory", body: "Sell without stocking. Dealer delivers to the shop.", accent: "#FF5A1F" },
   { icon: CircleDollarSign, title: "Fitments Pay Off Your Tools", tag: "Rent-to-own", body: "Every fitment pays an EMI on a machine.", accent: "#FFB020" },
@@ -71,7 +71,7 @@ function TiltCard({ f }: { f: F }) {
             <div className="w-fit max-w-[85%] rounded-2xl rounded-bl-sm bg-ink-600 px-4 py-2">
               ✅ Fitment verified! <b>+60 pts</b><br />🔧 30 pts went to your tyre changer EMI (78% owned)
             </div>
-            <div className="ml-auto w-fit rounded-2xl rounded-br-sm bg-[#005C4B] px-4 py-2">refer karo</div>
+            <div className="ml-auto w-fit rounded-2xl rounded-br-sm bg-[#005C4B] px-4 py-2">refer a rider</div>
             <div className="w-fit rounded-2xl rounded-bl-sm bg-ink-600 px-4 py-2">🎟 Code <b>GG-K7Q2M</b> ready to forward</div>
           </div>
         )}
