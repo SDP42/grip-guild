@@ -14,13 +14,14 @@ export default function Nav() {
         <div className="hidden items-center gap-7 text-sm text-bone-dim md:flex">
           <a href="#insight" className="hover:text-bone">Insight</a>
           <a href="#pillars" className="hover:text-bone">Program</a>
+          <a href="#personas" className="hover:text-bone">Personas</a>
           <a href="#features" className="hover:text-bone">Features</a>
           <a href="#tiers" className="hover:text-bone">Tiers</a>
           <a href="#impact" className="hover:text-bone">Impact</a>
         </div>
         <div className="flex items-center gap-2">
           <Link href="/command" className="btn-ghost hidden sm:inline-flex">Command Centre</Link>
-          <Link href="/app" className="btn-primary">Open App</Link>
+          <Link href="/personas" className="btn-primary">Try it live</Link>
         </div>
       </nav>
     </motion.header>
