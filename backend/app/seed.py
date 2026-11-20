@@ -182,7 +182,7 @@ def seed(force: bool = False) -> None:
         for i in range(320):
             d = R.choice(districts)
             pilot = d.cohort == "pilot"
-            lifetime = int(R.paretovariate(1.4) * 900) if pilot else R.randint(0, 400)
+            lifetime = int(R.paretovariate(1.3) * 1300) if pilot else R.randint(0, 400)
             lifetime = min(lifetime, 26000)
             m = Mechanic(
                 name=f"{R.choice(FIRST)} {R.choice(LAST)}",
@@ -221,7 +221,7 @@ def seed(force: bool = False) -> None:
 
         for m in R.sample(mechanics, 90) + [hero]:
             t = R.choice(tools[5:])
-            paid = R.randint(int(t.points_cost * 0.1), t.points_cost)
+            paid = t.points_cost if R.random() < 0.25 else R.randint(int(t.points_cost * 0.1), t.points_cost - 1)
             s.add(ToolLease(mechanic_id=m.id, tool_id=t.id, points_paid=paid if m is not hero else 21400,
                             points_total=t.points_cost if m is not hero else tools[11].points_cost,
                             started_at=NOW - timedelta(days=R.randint(5, 150)),
@@ -246,7 +246,7 @@ def seed(force: bool = False) -> None:
                           vehicle=R.choice(VEHICLES), rider_phone_masked=_mask(),
                           points={"stock": 50, "ghost_shelf": 60, "referral": 80}[channel],
                           channel=channel, created_at=created,
-                          reminder_due_at=created + timedelta(days=R.randint(300, 540))))
+                          reminder_due_at=created + timedelta(days=R.randint(150, 420))))
         s.commit()
 
         codes = set()
