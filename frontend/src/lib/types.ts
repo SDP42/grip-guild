@@ -16,7 +16,7 @@ export type Profile = {
   mechanic: {
     id: number; name: string; shop_name: string; language: string; tier: string; points: number;
     lifetime_points: number; streak_weeks: number; rating: number; ratings_count: number;
-    stocks_eurogrip: boolean; shop_type: string; persona: string | null;
+    stocks_eurogrip: boolean; shop_type: string; persona: string | null; circle_id: number | null;
   };
   district: { name: string; state: string };
   circle: { name: string; goal_fitments: number; progress_fitments: number; unlock_reward: string } | null;
@@ -42,10 +42,18 @@ export const TIER_COLORS: Record<string, string> = {
 
 export type Quest = {
   slug: string; title: string; season: string; goal: string; target: number; reward: string;
-  color: string; current: number; pct: number; done: boolean;
+  color: string; current: number; pct: number; done: boolean; claimed: boolean; points: number;
 };
 
 export type Persona = {
   slug: string; kind: "mechanic" | "rider" | "dealer" | "field" | "brand"; name: string; role: string;
   hook: string; try: string[]; href: string; accent: string; shop?: string; district?: string; tier?: string;
 };
+
+export type CoachCard = { priority: number; kind: string; title: string; body: string; cta: string; href: string };
+export type Coach = [{ greeting: string; unread: number }, ...CoachCard[]];
+
+export type Notice = { id: number; kind: string; title: string; body: string; link: string; created_at: string; read: boolean };
+export type SOS = { id: number; rider_name: string; distance_km: number; eta_min: number; status: string; created_at: string; lat: number; lng: number };
+export type Due = { fitment_id: number; rider: string; tyre_model: string; vehicle: string; serial: string; due: string; overdue: boolean };
+export type Inbox = { notifications: Notice[]; unread: number; sos: SOS[]; boomerang: Due[] };
