@@ -1,12 +1,28 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { api, post } from "@/lib/api";
 import { BadgeCheck, ShieldCheck } from "lucide-react";
 import { useMe } from "@/components/app/MeContext";
 import { TIER_COLORS } from "@/lib/types";
 
+type App = { id: number; amount_inr: number; purpose: string; status: string; emi_inr: number; created_at: string; limit_inr?: number };
+const ST: Record<string, string> = { approved: "#C6FF3D", review: "#FFB020", declined: "#F43F5E" };
+
 export default function Passport() {
-  const { me } = useMe();
+  const { me, refresh } = useMe();
+  const [amount, setAmount] = useState(20000);
+  const [purpose, setPurpose] = useState("Workshop equipment");
+  const [apps, setApps] = useState<App[]>([]);
+  const [last, setLast] = useState<App | null>(null);
+  const meId = me?.mechanic.id;
+  useEffect(() => { if (meId) api<App[]>(`/api/mechanics/${meId}/credit`).then(setApps); }, [meId]);
+  async function apply() {
+    if (!meId) return;
+    const r = await post<App>("/api/passport/apply", { mechanic_id: meId, amount_inr: amount, purpose });
+    setLast(r); setApps(await api<App[]>(`/api/mechanics/${meId}/credit`)); refresh();
+  }
   const x = useMotionValue(0.5);
   const y = useMotionValue(0.5);
   const rx = useSpring(useTransform(y, [0, 1], [14, -14]));
@@ -58,6 +74,30 @@ export default function Passport() {
         <div className="flex items-center gap-3 rounded-2xl bg-ink-800 p-4">
           <BadgeCheck className="h-6 w-6 text-sky" />
           <div className="flex-1"><p className="text-sm font-semibold">Insurance</p><p className="text-[11px] text-bone-dim">{p.insurance}</p></div>
+        </div>
+        <div className="card space-y-3 p-4">
+          <p className="text-sm font-semibold">Apply for working capital</p>
+          <label className="block text-xs text-bone-dim">Amount: <b className="text-bone">₹{amount.toLocaleString("en-IN")}</b>
+            <input type="range" min={5000} max={150000} step={5000} value={amount} onChange={(e) => setAmount(+e.target.value)} className="mt-1 w-full accent-[#C6FF3D]" />
+          </label>
+          <div className="flex flex-wrap gap-1.5">
+            {["Workshop equipment", "Tyre stock", "Shop renovation", "Family emergency"].map((x) => (
+              <button key={x} onClick={() => setPurpose(x)} className={`chip ${purpose === x ? "!border-volt !text-volt" : ""}`}>{x}</button>
+            ))}
+          </div>
+          <button onClick={apply} className="btn w-full bg-volt text-ink">Apply with my Guild Passport</button>
+          {last && (
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl p-3 text-sm" style={{ background: `${ST[last.status]}18`, color: ST[last.status] }}>
+              {last.status === "approved" ? "✅ Approved instantly" : last.status === "review" ? "⏳ Sent for review" : "✖ Above your limit"} · ₹{last.amount_inr.toLocaleString("en-IN")} · EMI ₹{last.emi_inr.toLocaleString("en-IN")}/month · limit ₹{last.limit_inr?.toLocaleString("en-IN")}
+            </motion.p>
+          )}
+          {apps.length > 0 && (
+            <ul className="space-y-1 text-xs">
+              {apps.slice(0, 4).map((a) => (
+                <li key={a.id} className="flex justify-between rounded-lg bg-ink-700 px-3 py-1.5"><span>{a.purpose} · ₹{a.amount_inr.toLocaleString("en-IN")}</span><span className="capitalize" style={{ color: ST[a.status] }}>{a.status}</span></li>
+              ))}
+            </ul>
+          )}
         </div>
         <p className="pt-2 text-sm font-semibold">Badges</p>
         <div className="flex flex-wrap gap-2">
