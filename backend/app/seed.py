@@ -13,6 +13,11 @@ from .models import (
     Circle,
     Dealer,
     District,
+    FieldVisit,
+    FleetAccount,
+    GhostOrder,
+    RiderRating,
+    TreadCheck,
     Fitment,
     FraudAlert,
     Mechanic,
@@ -119,6 +124,27 @@ MODULES = [
 ]
 
 
+PERSONA_MECHANICS = [
+    dict(slug="ravi", name="Ravi Kumar", shop="Sai Puncture Works", district="Pune", type="puncture",
+         stocks=False, lifetime=7420, points=3840, streak=11, rating=4.8, ratings=164, days=142,
+         leases=[(11, 0.70)]),
+    dict(slug="gurpreet", name="Gurpreet Singh", shop="Royal Two Wheeler Clinic", district="Ludhiana",
+         type="multi-brand", stocks=True, lifetime=15800, points=6200, streak=24, rating=4.9, ratings=231,
+         days=196, leases=[(10, 1.0), (12, 0.48)]),
+    dict(slug="imran", name="Imran Shaikh", shop="New Star Puncture Point", district="Lucknow", type="puncture",
+         stocks=False, lifetime=220, points=220, streak=1, rating=4.3, ratings=6, days=6, leases=[]),
+    dict(slug="lakshmi", name="Lakshmi Reddy", shop="Volt Bike Care", district="Chennai", type="garage",
+         stocks=True, lifetime=3100, points=1450, streak=9, rating=4.9, ratings=88, days=110,
+         leases=[(7, 0.42)]),
+]
+PERSONA_CERTS = {
+    "ravi": ["tubeless-101", "ev-tyres", "treadlens", "safe-fit", "talk-to-riders"],
+    "gurpreet": ["tubeless-101", "treadlens", "safe-fit", "talk-to-riders", "monsoon-grip"],
+    "imran": [],
+    "lakshmi": ["ev-tyres", "treadlens", "safe-fit"],
+}
+
+
 def _serial() -> str:
     return "EG" + "".join(R.choice("0123456789ABCDEF") for _ in range(10))
 
@@ -200,15 +226,22 @@ def seed(force: bool = False) -> None:
             )
             s.add(m)
             mechanics.append(m)
-        # A hero mechanic for the demo app (id 1 after commit ordering is not guaranteed; we flag by name)
-        hero = Mechanic(name="Ravi Kumar", shop_name="Sai Puncture Works", district_id=districts[0].id,
-                        circle_id=circles[0].id, lat=18.515, lng=73.85, language="Marathi",
-                        phone_masked="+91 98XXX XX42", shop_type="puncture", stocks_eurogrip=False,
-                        tier="Master", points=3840, lifetime_points=7420, streak_weeks=11, rating=4.8,
-                        ratings_count=164, joined_at=NOW - timedelta(days=142), avatar_seed=7)
-        s.add(hero)
+        # Demo personas — real-feeling mechanics the visitor can "become".
+        persona_rows = {}
+        for spec in PERSONA_MECHANICS:
+            d = next(x for x in districts if x.name == spec["district"])
+            circle = next((c for c in circles if c.district_id == d.id), None)
+            pm = Mechanic(name=spec["name"], shop_name=spec["shop"], district_id=d.id,
+                          circle_id=circle.id if circle else None, lat=d.lat + 0.004, lng=d.lng - 0.006,
+                          language="English", phone_masked=_mask(), shop_type=spec["type"],
+                          stocks_eurogrip=spec["stocks"], tier=tier_for(spec["lifetime"]), points=spec["points"],
+                          lifetime_points=spec["lifetime"], streak_weeks=spec["streak"], rating=spec["rating"],
+                          ratings_count=spec["ratings"], joined_at=NOW - timedelta(days=spec["days"]),
+                          avatar_seed=1, persona=spec["slug"])
+            s.add(pm)
+            persona_rows[spec["slug"]] = (pm, spec)
         s.commit()
-        mechanics.append(hero)
+        mechanics.extend(pm for pm, _ in persona_rows.values())
 
         tools = []
         for name, cat, mrp, tier, icon, blurb in TOOLS:
@@ -219,18 +252,20 @@ def seed(force: bool = False) -> None:
             tools.append(t)
         s.commit()
 
-        for m in R.sample(mechanics, 90) + [hero]:
+        randoms = [m for m in mechanics if not m.persona]
+        for m in R.sample(randoms, 90):
             t = R.choice(tools[5:])
             paid = t.points_cost if R.random() < 0.25 else R.randint(int(t.points_cost * 0.1), t.points_cost - 1)
-            s.add(ToolLease(mechanic_id=m.id, tool_id=t.id, points_paid=paid if m is not hero else 21400,
-                            points_total=t.points_cost if m is not hero else tools[11].points_cost,
+            s.add(ToolLease(mechanic_id=m.id, tool_id=t.id, points_paid=paid, points_total=t.points_cost,
                             started_at=NOW - timedelta(days=R.randint(5, 150)),
                             status="owned" if paid >= t.points_cost else "active"))
+        for pm, spec in persona_rows.values():
+            for tool_idx, pct in spec["leases"]:
+                t = tools[tool_idx]
+                paid = int(t.points_cost * pct)
+                s.add(ToolLease(mechanic_id=pm.id, tool_id=t.id, points_paid=paid, points_total=t.points_cost,
+                                started_at=NOW - timedelta(days=60), status="owned" if pct >= 1 else "active"))
         s.commit()
-        # make sure hero's lease is the pneumatic changer
-        hero_lease = s.exec(select(ToolLease).where(ToolLease.mechanic_id == hero.id)).first()
-        hero_lease.tool_id = tools[11].id
-        s.add(hero_lease)
 
         weights = [max(1, m.lifetime_points // 100) for m in mechanics]
         seen = set()
@@ -272,7 +307,7 @@ def seed(force: bool = False) -> None:
         s.commit()
         for m in mechanics:
             for mod in mods:
-                if R.random() < (0.35 if m.lifetime_points > 1500 else 0.08) or (m is hero and mod.slug != "monsoon-grip"):
+                if (mod.slug in PERSONA_CERTS.get(m.persona, [])) if m.persona else R.random() < (0.35 if m.lifetime_points > 1500 else 0.08):
                     s.add(Certification(mechanic_id=m.id, module_id=mod.id, score=R.randint(70, 100),
                                         verify_code=_code().replace("GG", "GC"),
                                         issued_at=NOW - timedelta(days=R.randint(1, 120))))
@@ -295,6 +330,42 @@ def seed(force: bool = False) -> None:
                              mechanic_id=m.id, distance_km=dist, eta_min=int(dist * 4 + 3),
                              status=R.choice(["fixed", "fixed", "routed"]),
                              created_at=NOW - timedelta(hours=R.randint(1, 720))))
+        s.commit()
+
+        # Ghost Shelf orders, Tyre Twin checks, fleets, ratings, field visits
+        non_stock = [m for m in mechanics if not m.stocks_eurogrip]
+        for _ in range(140):
+            m = R.choice(non_stock)
+            dl = R.choice([x for x in dealers if x.district_id == m.district_id])
+            s.add(GhostOrder(mechanic_id=m.id, dealer_id=dl.id, tyre_model=R.choice(TYRE_MODELS),
+                             size=R.choice(["90/90-17", "90/100-10", "80/100-18", "100/80-17"]),
+                             status=R.choices(["fitted", "delivered", "dispatched", "placed"], [60, 15, 15, 10])[0],
+                             created_at=NOW - timedelta(hours=R.randint(1, 900)), eta_hours=dl.ghost_shelf_sla_hours))
+        fits = s.exec(select(Fitment)).all()
+        for f in R.sample(fits, 500):
+            depth = R.uniform(4.5, 6.0)
+            for k in range(R.randint(1, 4)):
+                depth -= R.uniform(0.4, 1.1)
+                s.add(TreadCheck(serial=f.serial, mechanic_id=f.mechanic_id, tread_mm=round(max(1.0, depth), 1),
+                                 psi=R.randint(22, 32), score=R.randint(30, 95),
+                                 created_at=f.created_at + timedelta(days=60 * (k + 1))))
+        for name, city, riders, plan in [("SwiftDrop Logistics", "Pune", 820, "Pro"), ("CityBite Riders", "Bengaluru", 1450, "Pro"),
+                                         ("QuickKart Fleet", "Chennai", 610, "Basic"), ("ParcelPro", "Lucknow", 380, "Basic"),
+                                         ("MetroMeals Delivery", "Hyderabad", 990, "Pro")]:
+            s.add(FleetAccount(name=name, city=city, riders=riders, plan=plan,
+                               monthly_fee_inr=riders * (39 if plan == "Pro" else 19),
+                               jobs_30d=int(riders * R.uniform(0.18, 0.35)), avg_downtime_min=R.randint(22, 41)))
+        comments = ["Fixed my tubeless in 10 minutes", "Honest advice, didn't oversell", "Great tyre check card",
+                    "Open late, saved my delivery shift", "Explained wear pattern clearly", "Fair price, fast work"]
+        for m in R.sample(mechanics, 200):
+            s.add(RiderRating(mechanic_id=m.id, stars=R.choices([5, 4, 3], [6, 3, 1])[0], comment=R.choice(comments),
+                              created_at=NOW - timedelta(hours=R.randint(1, 700))))
+        officers = ["Anita Desai", "Vikram Rao", "Sameer Khan"]
+        for m in R.sample(mechanics, 60):
+            s.add(FieldVisit(mechanic_id=m.id, officer=R.choice(officers),
+                             purpose=R.choice(["onboard", "nudge", "kit_delivery", "board_install", "audit"]),
+                             status=R.choice(["planned", "done"]),
+                             scheduled_for=NOW + timedelta(hours=R.randint(-72, 72))))
         s.commit()
 
 

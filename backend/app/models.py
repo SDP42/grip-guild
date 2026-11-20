@@ -60,6 +60,7 @@ class Mechanic(SQLModel, table=True):
     ratings_count: int
     joined_at: datetime
     avatar_seed: int
+    persona: Optional[str] = Field(default=None, index=True)  # demo persona slug
 
 
 class Tool(SQLModel, table=True):
@@ -154,3 +155,59 @@ class SOSRequest(SQLModel, table=True):
     eta_min: int
     status: str  # routed | fixed
     created_at: datetime
+
+
+class GhostOrder(SQLModel, table=True):
+    """Ghost Shelf order: a non-stocking shop orders a tyre, the dealer delivers it."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    mechanic_id: int = Field(foreign_key="mechanic.id")
+    dealer_id: int = Field(foreign_key="dealer.id")
+    tyre_model: str
+    size: str
+    status: str  # placed | dispatched | delivered | fitted
+    created_at: datetime
+    eta_hours: int
+
+
+class TreadCheck(SQLModel, table=True):
+    """Tyre Twin history: every TreadLens check on a registered tyre."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    serial: str = Field(index=True)
+    mechanic_id: int = Field(foreign_key="mechanic.id")
+    tread_mm: float
+    psi: float
+    score: int
+    created_at: datetime
+
+
+class FleetAccount(SQLModel, table=True):
+    """Fleet Pit Pass: a gig/delivery fleet buys priority tyre care at Guild shops."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str
+    city: str
+    riders: int
+    plan: str  # Basic | Pro
+    monthly_fee_inr: int
+    jobs_30d: int
+    avg_downtime_min: int
+
+
+class RiderRating(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    mechanic_id: int = Field(foreign_key="mechanic.id")
+    stars: int
+    comment: str
+    created_at: datetime
+
+
+class FieldVisit(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    mechanic_id: int = Field(foreign_key="mechanic.id")
+    officer: str
+    purpose: str  # onboard | nudge | kit_delivery | board_install | audit
+    status: str  # planned | done
+    scheduled_for: datetime
+    notes: str = ""
