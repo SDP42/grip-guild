@@ -44,7 +44,7 @@ export default function Dealer() {
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-6 sm:px-6">
-      <PersonaHeader initials="BT" color="#A78BFA" kind="Dealer" name={q?.dealer.name ?? "Dealer"} sub={`Eurogrip dealer serving Sai Puncture Works · Ghost Shelf SLA ${q?.dealer.ghost_shelf_sla_hours ?? "–"} h`} />
+      <PersonaHeader initials={(q?.dealer.name ?? "D").split(" ").map((w) => w[0]).join("").slice(0, 2)} color="#A78BFA" kind="Dealer" name={q?.dealer.name ?? "Dealer"} sub={`Eurogrip dealer serving Sai Puncture Works · Ghost Shelf SLA ${q?.dealer.ghost_shelf_sla_hours ?? "–"} h`} />
 
       <label className="mt-4 flex flex-wrap items-center gap-2 text-xs text-bone-dim">
         Viewing dealer

@@ -42,4 +42,7 @@ def personas(session: Session = Depends(get_session)):
              "tier": m.tier, "href": f"/app?persona={m.persona}", **STORIES[m.persona]} for m, d in rows]
     order = list(STORIES)
     mech.sort(key=lambda x: order.index(x["slug"]))
-    return mech + OTHERS
+    from .ecosystem import dealer_persona
+    dealer = dealer_persona(session)
+    others = [{**o, "name": dealer["name"]} if o["slug"] == "dealer" else o for o in OTHERS]
+    return mech + others
