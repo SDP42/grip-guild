@@ -5,7 +5,8 @@ from sqlmodel import Session, func, select
 
 from ..db import get_session
 from ..models import (Certification, Circle, District, Fitment, FraudAlert, Mechanic, Module,
-                      Referral, Tool, ToolLease)
+                      Referral, RiderRating, Tool, ToolLease, TreadCheck)
+from ..services.quests import progress
 from ..seed import NOW
 from ..services.scoring import guild_score
 from ..services.tiers import TIERS, next_tier
@@ -13,9 +14,10 @@ from ..services.tiers import TIERS, next_tier
 router = APIRouter(prefix="/api/mechanics", tags=["mechanics"])
 
 
-def hero_id(session: Session) -> int:
-    m = session.exec(select(Mechanic).where(Mechanic.shop_name == "Sai Puncture Works",
-                                            Mechanic.name == "Ravi Kumar")).first()
+def persona_id(session: Session, slug: str = "ravi") -> int:
+    m = session.exec(select(Mechanic).where(Mechanic.persona == slug)).first()
+    if not m:
+        raise HTTPException(404, f"Unknown persona '{slug}'")
     return m.id
 
 
@@ -46,8 +48,8 @@ def list_mechanics(session: Session = Depends(get_session), district_id: int | N
 
 
 @router.get("/me")
-def me(session: Session = Depends(get_session)):
-    return profile(hero_id(session), session)
+def me(persona: str = "ravi", session: Session = Depends(get_session)):
+    return profile(persona_id(session, persona), session)
 
 
 @router.get("/leaderboard")
@@ -97,7 +99,23 @@ def profile(mechanic_id: int, session: Session = Depends(get_session)):
                       "conversion_pct": round(100 * sum(r.status == "redeemed" for r in refs) / max(1, len(refs)))},
         "boomerang_upcoming": len(boomerang),
         "passport": passport(m, score, len(fits)),
+        "quests": quest_progress(session, m, fits, refs),
+        "ratings": [r.model_dump() for r in session.exec(
+            select(RiderRating).where(RiderRating.mechanic_id == m.id).order_by(RiderRating.created_at.desc())).all()[:5]],
     }
+
+
+def quest_progress(session: Session, m: Mechanic, fits, refs) -> list[dict]:
+    since = NOW - timedelta(days=60)
+    checks = session.exec(select(func.count()).select_from(TreadCheck).where(
+        TreadCheck.mechanic_id == m.id, TreadCheck.created_at > since)).one()
+    ev = sum(1 for f in fits if f.vehicle in ("Ather 450X", "Ola S1"))
+    return progress({
+        "tread_checks": checks,
+        "fitments": sum(1 for f in fits if f.created_at > since),
+        "ev_fitments": ev,
+        "redeemed": sum(1 for r in refs if r.status == "redeemed" and r.created_at > NOW - timedelta(days=30)),
+    })
 
 
 def passport(m: Mechanic, score: dict, fitments: int) -> dict:
