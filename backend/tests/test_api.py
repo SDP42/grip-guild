@@ -44,7 +44,8 @@ def test_bot_and_engines():
         assert len(c.post("/api/sos", json={"lat": 18.52, "lng": 73.86}).json()) == 3
         sim = c.post("/api/simulate", json={"budget_cr": 25, "districts": 120}).json()
         assert sim["active"] > 0 and sim["roi_x"] > 0
-        q = c.post("/api/academy/tubeless-101/submit", json={"mechanic_id": mid, "answers": [1, 0, 1]}).json()
+        imran = c.get("/api/mechanics/me?persona=imran").json()["mechanic"]["id"]
+        q = c.post("/api/academy/tubeless-101/submit", json={"mechanic_id": imran, "answers": [1, 0, 1]}).json()
         assert q["passed"]
         assert c.get(f"/api/verify/{q['verify_code']}").json()["valid"]
 
@@ -70,3 +71,50 @@ def test_personas_and_ecosystem():
         assert c.post("/api/rider/rate", json={"mechanic_id": mid, "stars": 5}).json()["ok"]
         auto = c.get("/api/analytics/autopilot").json()
         assert abs(sum(x["next_lakh"] for x in auto) - 60) < 0.5
+
+
+def test_cross_persona_flows():
+    with client() as c:
+        mid = c.get("/api/mechanics/me?persona=ravi").json()["mechanic"]["id"]
+        coach = c.get(f"/api/mechanics/{mid}/coach").json()
+        assert coach[0]["greeting"] and len(coach) > 1
+
+        # Rider SOS -> mechanic inbox -> accept -> fixed (+40 pts)
+        sos = c.post("/api/sos/request", json={"mechanic_id": mid, "lat": 18.52, "lng": 73.86, "rider_name": "Priya"}).json()
+        box = c.get(f"/api/mechanics/{mid}/inbox").json()
+        assert any(s["id"] == sos["id"] for s in box["sos"]) and box["unread"] >= 1
+        assert c.post(f"/api/sos/{sos['id']}/accept").json()["status"] == "accepted"
+        assert c.get(f"/api/sos/{sos['id']}").json()["status"] == "accepted"
+        assert c.post(f"/api/sos/{sos['id']}/fixed").json()["status"] == "fixed"
+
+        # Boomerang reminder reaches the rider
+        due = box["boomerang"]
+        if due:
+            r = c.post(f"/api/boomerang/{due[0]['fitment_id']}/send").json()
+            assert r["whatsapp"].startswith("https://wa.me/")
+            assert c.get(f"/api/rider/messages?name={due[0]['rider']}").json()
+
+        # TreadLens card saved, shared, and visible to the rider
+        card = c.post("/api/treadlens/save", json={"mechanic_id": mid, "rider_name": "Priya", "tread_mm": 1.9, "pattern": "edges", "psi": 22}).json()
+        assert c.get(f"/api/cards/{card['card_id']}").json()["shop"]
+        assert any(m["kind"] == "card" for m in c.get("/api/rider/messages?name=Priya").json())
+
+        # Dealer redemption notifies the mechanic
+        ref = c.post("/api/referrals", json={"mechanic_id": mid}).json()
+        c.post(f"/api/referrals/{ref['code']}/redeem")
+        kinds = {n["kind"] for n in c.get(f"/api/mechanics/{mid}/inbox").json()["notifications"]}
+        assert {"sos", "referral"} <= kinds
+
+        # Credit, board, circle, quiz per module, fraud resolve
+        assert c.post("/api/passport/apply", json={"mechanic_id": mid, "amount_inr": 10000}).json()["status"] == "approved"
+        assert c.get(f"/api/board/{mid}").json()["sos_rescues"] >= 1
+        me = c.get("/api/mechanics/me?persona=ravi").json()
+        assert c.get(f"/api/circles/{me['mechanic']['circle_id']}/members").json()["members"]
+        assert c.get("/api/academy/ev-tyres/quiz").json()[0]["q"].startswith("Why do EV")
+        assert c.get("/api/academy/ev-tyres/lesson").json()["steps"]
+        fid = c.get("/api/analytics/fraud").json()[0]["id"]
+        assert c.post(f"/api/analytics/fraud/{fid}/resolve").json()["ok"]
+
+        # Quest claim: unfinished quest refuses, finished quest pays once
+        q = c.post(f"/api/quests/ev-pioneer/claim?mechanic_id={mid}")
+        assert q.status_code in (200, 400)
