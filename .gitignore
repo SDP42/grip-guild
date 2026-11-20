@@ -18,3 +18,10 @@ __pycache__/
 .DS_Store
 .vercel
 *.schema
+
+# Deliverables stay local (not in GitHub)
+*.docx
+*.pptx
+*.mp4
+*.mov
+video/
