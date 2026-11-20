@@ -9,7 +9,7 @@ import { BadgeCheck, CalendarClock, Layers, ShieldAlert, Thermometer } from "luc
 import { Area, AreaChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api } from "@/lib/api";
 import { Logo } from "@/components/Logo";
-import type { WearPattern } from "@/components/three/TyreTwin";
+import { TWIN_LAYERS, type WearPattern } from "@/components/three/TyreTwin";
 
 const TyreTwin = dynamic(() => import("@/components/three/TyreTwin"), { ssr: false });
 
@@ -56,6 +56,16 @@ function TwinView() {
             <p className="font-mono text-xs text-bone-mute">{twin?.serial ?? "loading…"} · drag to orbit</p>
           </div>
           <TyreTwin wear={wear} pattern={pattern} exploded={exploded} heatmap={heatmap} />
+          <ul className={`absolute right-5 top-5 z-10 space-y-1.5 transition-opacity duration-500 ${exploded > 0.4 ? "opacity-100" : "opacity-0"}`}>
+            {TWIN_LAYERS.map((l, i) => (
+              <li key={l.name} className="flex items-center gap-2 rounded-lg border border-white/10 bg-ink/70 px-2.5 py-1.5 text-[11px] backdrop-blur">
+                <span className="font-mono text-bone-mute">0{i + 1}</span>
+                <span className="h-2 w-2 rounded-full" style={{ background: l.color }} />
+                <span className="font-semibold">{l.name}</span>
+                <span className="hidden text-bone-mute sm:inline">· {l.detail}</span>
+              </li>
+            ))}
+          </ul>
           <div className="absolute inset-x-4 bottom-4 z-10 rounded-2xl border border-white/10 bg-ink/70 p-4 backdrop-blur-xl">
             <div className="flex flex-wrap items-center gap-4">
               <label className="flex min-w-[200px] flex-1 items-center gap-3 text-xs">

@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, Environment, Html, Lightformer, OrbitControls } from "@react-three/drei";
+import { ContactShadows, Environment, Lightformer, OrbitControls } from "@react-three/drei";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
@@ -47,17 +47,6 @@ function profile(rOut: number, rIn: number, width: number) {
   return pts;
 }
 
-function Label({ position, title, value, show }: { position: [number, number, number]; title: string; value: string; show: boolean }) {
-  return (
-    <Html position={position} center distanceFactor={7} style={{ pointerEvents: "none", opacity: show ? 1 : 0, transition: "opacity .4s" }}>
-      <div className="whitespace-nowrap rounded-lg border border-white/15 bg-ink/85 px-2.5 py-1.5 text-[11px] backdrop-blur">
-        <p className="font-mono text-[9px] uppercase tracking-widest text-molten">{title}</p>
-        <p className="font-semibold text-bone">{value}</p>
-      </div>
-    </Html>
-  );
-}
-
 function TwinModel({ wear, pattern, exploded, heatmap, spin }: { wear: number; pattern: WearPattern; exploded: number; heatmap: boolean; spin: boolean }) {
   const tread = useRef<THREE.InstancedMesh>(null);
   const root = useRef<THREE.Group>(null);
@@ -100,16 +89,15 @@ function TwinModel({ wear, pattern, exploded, heatmap, spin }: { wear: number; p
   useFrame((_, dt) => {
     e.current = THREE.MathUtils.damp(e.current, exploded, 5, dt);
     // Each layer slides out along the axle by a different amount.
-    const offsets = [2.1, 1.45, 0.85, -0.7, 0]; // tread, belt, carcass, bead, rim
+    const offsets = [1.6, 0.95, 0.35, -0.45, -1.15]; // tread, belt, carcass, bead, rim
     layers.current.forEach((l, idx) => { if (l) l.position.z = offsets[idx] * e.current; });
     if (root.current && spin) root.current.rotation.z -= dt * 0.25;
   });
 
   const set = (i: number) => (el: THREE.Object3D | null) => { layers.current[i] = el; };
-  const show = exploded > 0.5;
 
   return (
-    <group rotation={[0.25, -0.75, 0]}>
+    <group rotation={[0.22, -1.08, 0]}>
       <group ref={root}>
         <group ref={set(0)}>
           <instancedMesh ref={tread} args={[blockGeo, undefined, SEGMENTS * ROWS.length]} castShadow>
@@ -167,11 +155,6 @@ function TwinModel({ wear, pattern, exploded, heatmap, spin }: { wear: number; p
         </group>
       </group>
 
-      <Label position={[0, R_OUT + 0.35, 2.1]} title="Tread compound" value="Wear-mapped blocks" show={show} />
-      <Label position={[R_OUT + 0.4, 0, 1.45]} title="Belt" value="Nylon / steel cords" show={show} />
-      <Label position={[-R_OUT - 0.3, 0.3, 0.85]} title="Carcass" value="Load-bearing plies" show={show} />
-      <Label position={[0, -R_IN - 0.25, -0.7]} title="Bead" value="Steel wire bundle" show={show} />
-      <Label position={[0.3, 0.35, 0.2]} title="Rim" value="Alloy, 5-spoke" show={show} />
     </group>
   );
 }
@@ -194,3 +177,11 @@ export default function TyreTwin({ wear = 0.45, pattern = "edges", exploded = 0,
     </Canvas>
   );
 }
+
+export const TWIN_LAYERS = [
+  { name: "Tread compound", detail: "Wear-mapped blocks", color: "#FF5A1F" },
+  { name: "Belt", detail: "Nylon / steel cords", color: "#C9A66B" },
+  { name: "Carcass", detail: "Load-bearing plies", color: "#7E838E" },
+  { name: "Bead", detail: "Steel wire bundle", color: "#9aa0a8" },
+  { name: "Rim", detail: "Alloy, 5-spoke", color: "#d0d3d8" },
+];
