@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Activity, AlertTriangle, Gauge, Network, Sparkles, Users } from "lucide-react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { api } from "@/lib/api";
+import { api, post } from "@/lib/api";
 import { Logo } from "@/components/Logo";
 import CountUp from "@/components/CountUp";
 
@@ -221,7 +221,10 @@ export default function Command() {
                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: SEV[f.severity] }} />
                 <span className="w-28 truncate font-semibold">{f.shop}</span>
                 <span className="min-w-0 flex-1 truncate text-bone-dim">{f.detail}</span>
-                <span className={f.resolved ? "text-bone-mute" : "text-rose"}>{f.resolved ? "resolved" : "open"}</span>
+                {f.resolved ? <span className="text-bone-mute">resolved</span> : (
+                  <button onClick={async () => { await post(`/api/analytics/fraud/${f.id}/resolve`, {}); setFraud((x) => x.map((y) => (y.id === f.id ? { ...y, resolved: true } : y))); }}
+                    className="rounded-lg bg-rose/20 px-2 py-1 font-semibold text-rose">Resolve</button>
+                )}
               </li>
             ))}
           </ul>
