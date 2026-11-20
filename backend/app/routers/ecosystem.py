@@ -81,6 +81,15 @@ def dealers(session: Session = Depends(get_session)):
     return [{**d.model_dump(), "district": x.name} for d, x in rows]
 
 
+@router.get("/dealer/persona")
+def dealer_persona(session: Session = Depends(get_session)):
+    """The dealer persona is the dealer that serves Ravi's puncture shop, so demo flows connect."""
+    ravi = session.exec(select(Mechanic).where(Mechanic.persona == "ravi")).first()
+    ds = session.exec(select(Dealer).where(Dealer.district_id == ravi.district_id)).all()
+    d = min(ds, key=lambda x: haversine_km(ravi.lat, ravi.lng, x.lat, x.lng))
+    return {"id": d.id, "name": d.name}
+
+
 @router.get("/dealer/{dealer_id}/queue")
 def dealer_queue(dealer_id: int, session: Session = Depends(get_session)):
     d = session.get(Dealer, dealer_id)
