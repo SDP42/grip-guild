@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Unbounded } from "next/font/google";
 import "./globals.css";
+import WakeBanner from "@/components/WakeBanner";
 
 const display = Unbounded({ subsets: ["latin"], variable: "--font-display", weight: ["500", "700", "900"] });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -17,7 +18,10 @@ export const viewport: Viewport = { themeColor: "#07080A" };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
-      <body className="grain font-sans">{children}</body>
+      <body className="grain font-sans">
+        <WakeBanner />
+        {children}
+      </body>
     </html>
   );
 }
