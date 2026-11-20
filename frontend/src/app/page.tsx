@@ -11,6 +11,7 @@ import Impact from "@/components/landing/Impact";
 import Finale from "@/components/landing/Finale";
 import Personas from "@/components/landing/Personas";
 import TwinSection from "@/components/landing/TwinSection";
+import FilmStrip from "@/components/landing/FilmStrip";
 
 export default function Home() {
   return (
@@ -19,6 +20,7 @@ export default function Home() {
       <main>
         <Hero />
         <Marquee />
+        <FilmStrip />
         <Insight />
         <Pillars />
         <Personas />
