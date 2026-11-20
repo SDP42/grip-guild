@@ -16,7 +16,7 @@ export type Profile = {
   mechanic: {
     id: number; name: string; shop_name: string; language: string; tier: string; points: number;
     lifetime_points: number; streak_weeks: number; rating: number; ratings_count: number;
-    stocks_eurogrip: boolean; shop_type: string;
+    stocks_eurogrip: boolean; shop_type: string; persona: string | null;
   };
   district: { name: string; state: string };
   circle: { name: string; goal_fitments: number; progress_fitments: number; unlock_reward: string } | null;
@@ -31,9 +31,21 @@ export type Profile = {
   fitments_by_channel: Record<string, number>;
   referrals: { issued: number; redeemed: number; conversion_pct: number };
   boomerang_upcoming: number;
+  quests: Quest[];
+  ratings: { stars: number; comment: string; created_at: string }[];
   passport: { verified_months: number; verified_fitments: number; credit_line_inr: number; insurance: string; partner: string };
 };
 
 export const TIER_COLORS: Record<string, string> = {
   Apprentice: "#9CA3AF", Craftsman: "#38BDF8", Master: "#FFB020", Grandmaster: "#FF5A1F",
+};
+
+export type Quest = {
+  slug: string; title: string; season: string; goal: string; target: number; reward: string;
+  color: string; current: number; pct: number; done: boolean;
+};
+
+export type Persona = {
+  slug: string; kind: "mechanic" | "rider" | "dealer" | "field" | "brand"; name: string; role: string;
+  hook: string; try: string[]; href: string; accent: string; shop?: string; district?: string; tier?: string;
 };
