@@ -1,6 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
+import GLFallback, { useWebGL } from "./GLFallback";
 import { ContactShadows, Environment, Float, Lightformer, Sparkles } from "@react-three/drei";
 import { useRef } from "react";
 import * as THREE from "three";
@@ -25,7 +26,14 @@ function Rig() {
     const tiltX = THREE.MathUtils.lerp(0.18, 0, face) - heroScroll.pointerY * 0.15;
     g.parent!.rotation.y = THREE.MathUtils.damp(g.parent!.rotation.y, tiltY, 4, dt);
     g.parent!.rotation.x = THREE.MathUtils.damp(g.parent!.rotation.x, tiltX, 4, dt);
-    g.parent!.position.x = THREE.MathUtils.damp(g.parent!.position.x, THREE.MathUtils.lerp(1.75, 0, face), 4, dt);
+    // Phones: tyre sits centred in the upper half so the headline below stays readable.
+    const narrow = state.size.width < 640;
+    const tx = narrow ? 0 : THREE.MathUtils.lerp(1.75, 0, face);
+    const ty = narrow ? THREE.MathUtils.lerp(1.12, 0, face) : 0;
+    const ts = narrow ? THREE.MathUtils.lerp(0.5, 0.82, face) : 0.82;
+    g.parent!.position.x = THREE.MathUtils.damp(g.parent!.position.x, tx, 4, dt);
+    g.position.y = THREE.MathUtils.damp(g.position.y, ty, 4, dt); // on the group itself: Float drives its parent's y
+    g.scale.setScalar(THREE.MathUtils.damp(g.scale.x, ts, 4, dt));
 
     state.camera.position.z = THREE.MathUtils.lerp(6.2, 0.35, dive * dive);
     state.camera.lookAt(0, 0, 0);
@@ -43,6 +51,9 @@ function Rig() {
 }
 
 export default function HeroScene() {
+  const gl = useWebGL();
+  if (gl === false) return <GLFallback />;
+  if (gl === null) return null;
   return (
     <Canvas
       dpr={[1, 1.75]}

@@ -50,23 +50,24 @@ export default function Hero() {
     <section ref={root} className="relative h-[320vh]">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         <div className="absolute inset-0"><HeroScene /></div>
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#07080A_0%,rgba(7,8,10,.85)_30%,transparent_62%)]" />
+        <div className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(90deg,#07080A_0%,rgba(7,8,10,.85)_30%,transparent_62%)] sm:block" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,#07080A_0%,rgba(7,8,10,.92)_48%,rgba(7,8,10,.35)_68%,transparent_82%)] sm:hidden" />
 
-        <div className="hero-copy absolute inset-0 mx-auto flex max-w-7xl flex-col justify-center px-4 sm:px-6">
-          <span className="chip mb-6 w-fit">
+        <div className="hero-copy absolute inset-0 mx-auto flex max-w-7xl flex-col justify-end px-4 pb-20 sm:justify-center sm:px-6 sm:pb-0">
+          <span className="chip mb-4 w-fit sm:mb-6">
             <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-pulseRing rounded-full bg-volt" /><span className="relative h-2 w-2 rounded-full bg-volt" /></span>
             Eurogrip TORQ 4.0 · Case Study 4
           </span>
-          <h1 className="h-display max-w-2xl text-[12vw] sm:text-6xl lg:text-7xl">
+          <h1 className="h-display max-w-2xl text-[10.5vw] sm:text-6xl lg:text-7xl">
             Mechanics don&apos;t need cash.
             <br />
             <span className="gradient-molten">They need a Guild.</span>
           </h1>
-          <p className="mt-6 max-w-xl text-base text-bone-dim sm:text-lg">
+          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-bone-dim sm:mt-6 sm:text-lg">
             Grip Guild turns India&apos;s two-wheeler mechanics and puncture shops into Eurogrip advocates by giving them
             the three things that actually grow their business: <b className="text-bone">tools, customers and status</b>.
           </p>
-          <div className="pointer-events-auto mt-8 flex flex-wrap gap-3">
+          <div className="pointer-events-auto mt-6 flex flex-wrap gap-3 sm:mt-8">
             <a href="/app" className="btn-primary">Try the mechanic app</a>
             <a href="#insight" className="btn-ghost">See the strategy</a>
           </div>
