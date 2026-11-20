@@ -1,0 +1,102 @@
+{
+ "inputs": {
+  "budget_cr": 25,
+  "districts": 120,
+  "months": 12,
+  "mix": {
+   "tools": 0.4,
+   "visibility": 0.22,
+   "academy": 0.1,
+   "field": 0.18,
+   "digital": 0.1
+  }
+ },
+ "reachable_shops": 132000,
+ "enrolled": 45503,
+ "active": 35264,
+ "influenced_fitments": 2327424,
+ "incremental_tyres": 884421,
+ "incremental_revenue_cr": 128.24,
+ "gross_profit_cr": 38.47,
+ "roi_x": 1.54,
+ "cost_per_active_shop_inr": 7089,
+ "cost_per_incremental_tyre_inr": 282,
+ "spend_breakdown_cr": {
+  "tools": 10.0,
+  "visibility": 5.5,
+  "academy": 2.5,
+  "field": 4.5,
+  "digital": 2.5
+ },
+ "ramp": [
+  {
+   "month": 1,
+   "active": 8816,
+   "fitments": 48488
+  },
+  {
+   "month": 2,
+   "active": 17632,
+   "fitments": 96976
+  },
+  {
+   "month": 3,
+   "active": 26448,
+   "fitments": 145464
+  },
+  {
+   "month": 4,
+   "active": 35264,
+   "fitments": 193952
+  },
+  {
+   "month": 5,
+   "active": 35264,
+   "fitments": 193952
+  },
+  {
+   "month": 6,
+   "active": 35264,
+   "fitments": 193952
+  },
+  {
+   "month": 7,
+   "active": 35264,
+   "fitments": 193952
+  },
+  {
+   "month": 8,
+   "active": 35264,
+   "fitments": 193952
+  },
+  {
+   "month": 9,
+   "active": 35264,
+   "fitments": 193952
+  },
+  {
+   "month": 10,
+   "active": 35264,
+   "fitments": 193952
+  },
+  {
+   "month": 11,
+   "active": 35264,
+   "fitments": 193952
+  },
+  {
+   "month": 12,
+   "active": 35264,
+   "fitments": 193952
+  }
+ ],
+ "assumptions": {
+  "shops_per_district": 1100,
+  "enrol_rate": 0.55,
+  "active_rate": 0.62,
+  "influenced_fitments_pm": 5.5,
+  "incrementality": 0.38,
+  "tyre_asp_inr": 1450,
+  "gross_margin": 0.3
+ }
+}
