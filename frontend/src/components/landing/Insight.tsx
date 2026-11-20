@@ -1,4 +1,5 @@
 "use client";
+import Scramble from "../fx/Scramble";
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
@@ -48,7 +49,7 @@ export default function Insight() {
       <div className="tread-bg absolute inset-0 opacity-60" />
       <div className="relative flex h-full flex-col justify-center">
         <div className="mx-auto mb-10 w-full max-w-7xl px-4 sm:px-6">
-          <p className="eyebrow">The brief, decoded</p>
+          <p className="eyebrow"><Scramble text="The brief, decoded" /></p>
           <h2 className="h-display mt-3 text-4xl sm:text-6xl">Five insights. <span className="text-stroke">One design.</span></h2>
         </div>
         <div ref={track} className="flex w-max gap-6 px-4 sm:px-6 lg:pl-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))]">

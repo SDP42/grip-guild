@@ -1,4 +1,5 @@
 "use client";
+import Scramble from "../fx/Scramble";
 
 import { motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
@@ -27,7 +28,7 @@ export default function Tiers() {
       <div className="sticky top-0 flex h-screen items-center overflow-hidden">
         <div className="mx-auto grid w-full max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2">
           <div>
-            <p className="eyebrow">Status you can see from the road</p>
+            <p className="eyebrow"><Scramble text="Status you can see from the road" /></p>
             <h2 className="h-display mt-3 text-4xl sm:text-6xl">Climb the Guild.</h2>
             <ol className="mt-10 space-y-3">
               {TIERS.map((x, i) => (

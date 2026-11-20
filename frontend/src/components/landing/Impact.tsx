@@ -1,4 +1,5 @@
 "use client";
+import Scramble from "../fx/Scramble";
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -46,7 +47,7 @@ export default function Impact() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <p className="eyebrow">Measurability, built in</p>
+            <p className="eyebrow"><Scramble text="Measurability, built in" /></p>
             <h2 className="h-display mt-3 text-4xl sm:text-6xl">If it isn&apos;t measured,<br />it isn&apos;t in the Guild.</h2>
           </div>
           <span className="chip">
@@ -85,7 +86,7 @@ export default function Impact() {
           </div>
 
           <div className="card p-7">
-            <p className="eyebrow">Budget logic</p>
+            <p className="eyebrow"><Scramble text="Budget logic" /></p>
             <h3 className="mt-2 font-display text-2xl font-bold">1.5–2% of BU revenue → ~₹25 Cr / year</h3>
             <p className="mt-1 text-sm text-bone-dim">Planning estimate. 72% goes to things mechanics keep: tools, visibility, skills.</p>
             <div className="mt-8 flex h-10 overflow-hidden rounded-xl">

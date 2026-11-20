@@ -1,4 +1,5 @@
 "use client";
+import Scramble from "../fx/Scramble";
 
 import { motion } from "framer-motion";
 import { Crown, Users, Wrench } from "lucide-react";
@@ -34,7 +35,7 @@ export default function Pillars() {
   return (
     <section id="pillars" className="relative mx-auto max-w-7xl px-4 py-28 sm:px-6 sm:py-40">
       <div className="max-w-3xl">
-        <p className="eyebrow">The program</p>
+        <p className="eyebrow"><Scramble text="The program" /></p>
         <h2 className="h-display mt-3 text-4xl sm:text-6xl">
           We don&apos;t pay mechanics.<br /><span className="gradient-molten">We make them more successful.</span>
         </h2>

@@ -1,4 +1,5 @@
 "use client";
+import Scramble from "../fx/Scramble";
 
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import {
@@ -85,7 +86,7 @@ export default function Features() {
     <section id="features" className="relative mx-auto max-w-7xl px-4 py-28 sm:px-6">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <div>
-          <p className="eyebrow">12 features, one ecosystem</p>
+          <p className="eyebrow"><Scramble text="12 features, one ecosystem" /></p>
           <h2 className="h-display mt-3 text-4xl sm:text-6xl">Built for the<br />puncture shop.</h2>
         </div>
         <p className="max-w-md text-bone-dim">

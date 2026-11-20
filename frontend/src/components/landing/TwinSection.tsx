@@ -1,4 +1,5 @@
 "use client";
+import Scramble from "../fx/Scramble";
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -26,7 +27,7 @@ export default function TwinSection() {
     <section ref={ref} className="relative h-[320vh]">
       <div className="sticky top-0 grid h-screen items-center overflow-hidden lg:grid-cols-[1fr_1.3fr]">
         <div className="relative z-10 mx-auto max-w-xl px-4 sm:px-6 lg:ml-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))]">
-          <p className="eyebrow">Eurogrip&apos;s blind spot, fixed</p>
+          <p className="eyebrow"><Scramble text="Eurogrip's blind spot, fixed" /></p>
           <h2 className="h-display mt-3 text-4xl sm:text-6xl">Every tyre<br />gets a <span className="gradient-molten">twin.</span></h2>
           <div className="mt-10 space-y-6">
             {STEPS.map((s, i) => (
