@@ -9,7 +9,7 @@ import { BadgeCheck, CalendarClock, Layers, ShieldAlert, Thermometer } from "luc
 import { Area, AreaChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api } from "@/lib/api";
 import { Logo } from "@/components/Logo";
-import { TWIN_LAYERS, type WearPattern } from "@/components/three/TyreTwin";
+import { TWIN_LAYERS, type WearPattern } from "@/components/three/twinLayers";
 
 const TyreTwin = dynamic(() => import("@/components/three/TyreTwin"), { ssr: false });
 

@@ -10,7 +10,9 @@ import * as THREE from "three";
  * Tread blocks are coloured by a wear heatmap derived from TreadLens data.
  */
 
-export type WearPattern = "even" | "center" | "edges" | "one_side" | "cupping";
+import type { WearPattern } from "./twinLayers";
+
+export type { WearPattern };
 
 const R_OUT = 1.55;
 const R_IN = 1.02;
@@ -178,10 +180,3 @@ export default function TyreTwin({ wear = 0.45, pattern = "edges", exploded = 0,
   );
 }
 
-export const TWIN_LAYERS = [
-  { name: "Tread compound", detail: "Wear-mapped blocks", color: "#FF5A1F" },
-  { name: "Belt", detail: "Nylon / steel cords", color: "#C9A66B" },
-  { name: "Carcass", detail: "Load-bearing plies", color: "#7E838E" },
-  { name: "Bead", detail: "Steel wire bundle", color: "#9aa0a8" },
-  { name: "Rim", detail: "Alloy, 5-spoke", color: "#d0d3d8" },
-];
