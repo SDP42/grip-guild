@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Home, LayoutGrid, MessageCircle, ScanLine, Share2 } from "lucide-react";
+import { Bell, Home, LayoutGrid, MessageCircle, ScanLine, Share2 } from "lucide-react";
 import { Logo } from "../Logo";
 import { MECHANIC_PERSONAS, useMe } from "./MeContext";
 
@@ -17,7 +17,8 @@ const TABS = [
 
 export default function PhoneShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
-  const { error, me, persona, setPersona } = useMe();
+  const { error, me, inbox, persona, setPersona } = useMe();
+  const alerts = (inbox?.unread ?? 0) + (inbox?.sos.filter((x) => x.status === "requested").length ?? 0);
   return (
     <div className="relative min-h-screen bg-ink lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-10 lg:px-10">
       {/* Desktop side panel */}
@@ -45,6 +46,14 @@ export default function PhoneShell({ children }: { children: React.ReactNode }) 
 
       <div className="relative mx-auto h-[100dvh] w-full max-w-[430px] overflow-hidden bg-ink-900 lg:h-[860px] lg:rounded-[52px] lg:border-[10px] lg:border-ink-600 lg:shadow-[0_40px_120px_-20px_rgba(255,90,31,.35)]">
         <div className="absolute left-1/2 top-2 z-30 hidden h-7 w-28 -translate-x-1/2 rounded-full bg-black lg:block" />
+        <Link href="/app/inbox" aria-label="Inbox" className="absolute right-4 top-3 z-30 grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-ink-800/90 backdrop-blur lg:top-12">
+          <Bell className="h-5 w-5" />
+          {alerts > 0 && (
+            <motion.span key={alerts} initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-rose px-1 text-[10px] font-bold">
+              {alerts}
+            </motion.span>
+          )}
+        </Link>
         <div className="no-scrollbar h-full overflow-y-auto pb-28 pt-2 lg:pt-10">
           {error && (
             <div className="mx-4 mt-4 rounded-xl border border-rose/40 bg-rose/10 p-3 text-xs text-rose">
@@ -82,7 +91,9 @@ export default function PhoneShell({ children }: { children: React.ReactNode }) 
           <li>Scan the same serial twice → Fraud Guard blocks it.</li>
           <li><b className="text-bone">Refer</b> → generate a code → simulate the dealer redeeming it.</li>
           <li><b className="text-bone">Bot</b> → type &quot;hello&quot;, &quot;2&quot; or &quot;refer a rider&quot;.</li>
-          <li><b className="text-bone">More → TreadLens</b> → build a rider health card.</li>
+          <li><b className="text-bone">More → TreadLens</b> → save a health card and send it on WhatsApp.</li>
+          <li>Open <a href="/rider" target="_blank" className="text-molten underline">Priya&apos;s rider view</a> in a new tab, press SOS → the lead lands in this inbox 🔔.</li>
+          <li>Open the <a href="/dealer" target="_blank" className="text-molten underline">dealer view</a> and redeem your code → watch the points arrive.</li>
         </ol>
       </aside>
     </div>
