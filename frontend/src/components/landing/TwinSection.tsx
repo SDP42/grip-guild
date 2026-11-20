@@ -25,21 +25,21 @@ export default function TwinSection() {
 
   return (
     <section ref={ref} className="relative h-[320vh]">
-      <div className="sticky top-0 grid h-screen items-center overflow-hidden lg:grid-cols-[1fr_1.3fr]">
-        <div className="relative z-10 mx-auto max-w-xl px-4 sm:px-6 lg:ml-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))]">
+      <div className="sticky top-0 grid h-screen grid-rows-[40vh_1fr] overflow-hidden lg:grid-cols-[1fr_1.3fr] lg:grid-rows-1 lg:items-center">
+        <div className="relative z-10 row-start-2 mx-auto max-w-xl self-start px-4 sm:px-6 lg:row-start-1 lg:self-auto lg:ml-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))]">
           <p className="eyebrow"><Scramble text="Eurogrip's blind spot, fixed" /></p>
-          <h2 className="h-display mt-3 text-4xl sm:text-6xl">Every tyre<br />gets a <span className="gradient-molten">twin.</span></h2>
-          <div className="mt-10 space-y-6">
+          <h2 className="h-display mt-2 text-3xl sm:mt-3 sm:text-6xl">Every tyre<br />gets a <span className="gradient-molten">twin.</span></h2>
+          <div className="mt-5 space-y-3 sm:mt-10 sm:space-y-6">
             {STEPS.map((s, i) => (
               <div key={s.t} className={`border-l-2 pl-5 transition-all duration-500 ${i === step ? "border-molten opacity-100" : "border-white/10 opacity-35"}`}>
-                <p className="font-display text-xl font-bold">{s.t}</p>
-                <p className="mt-1 text-sm text-bone-dim">{s.d}</p>
+                <p className="font-display text-base font-bold sm:text-xl">{s.t}</p>
+                <p className={`mt-1 text-sm text-bone-dim ${i === step ? "" : "hidden sm:block"}`}>{s.d}</p>
               </div>
             ))}
           </div>
-          <Link href="/twin" className="btn-primary mt-10">Open a live Tyre Twin</Link>
+          <Link href="/twin" className="btn-primary mt-6 sm:mt-10">Open a live Tyre Twin</Link>
         </div>
-        <div className="absolute inset-0 opacity-50 lg:relative lg:h-full lg:opacity-100">
+        <div className="relative row-start-1 h-full lg:col-start-2 lg:h-full">
           <TyreTwin exploded={exploded} heatmap={heatmap} wear={0.55} pattern="edges" controls={false} />
         </div>
       </div>

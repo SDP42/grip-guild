@@ -50,7 +50,7 @@ function TwinView() {
         <Link href="/personas" className="btn-ghost">Personas</Link>
       </header>
       <div className="mx-auto grid max-w-7xl gap-6 px-4 pb-16 sm:px-6 lg:grid-cols-[1.35fr_1fr]">
-        <section className="card relative h-[460px] overflow-hidden sm:h-[620px]">
+        <section className="card relative h-[580px] overflow-hidden sm:h-[620px]">
           <div className="absolute left-5 top-5 z-10">
             <p className="eyebrow">Tyre Twin · 3D</p>
             <p className="font-mono text-xs text-bone-mute">{twin?.serial ?? "loading…"} · drag to orbit</p>
