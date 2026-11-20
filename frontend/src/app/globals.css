@@ -72,4 +72,4 @@ body {
 
 /* Responsive guards: grid/flex children may shrink below content width; never scroll sideways */
 .grid > * { min-width: 0; }
-body { overflow-x: clip; }
+html, body { overflow-x: clip; }
