@@ -25,7 +25,7 @@ function Rig() {
     const tiltX = THREE.MathUtils.lerp(0.18, 0, face) - heroScroll.pointerY * 0.15;
     g.parent!.rotation.y = THREE.MathUtils.damp(g.parent!.rotation.y, tiltY, 4, dt);
     g.parent!.rotation.x = THREE.MathUtils.damp(g.parent!.rotation.x, tiltX, 4, dt);
-    g.parent!.position.x = THREE.MathUtils.damp(g.parent!.position.x, THREE.MathUtils.lerp(1.55, 0, face), 4, dt);
+    g.parent!.position.x = THREE.MathUtils.damp(g.parent!.position.x, THREE.MathUtils.lerp(1.75, 0, face), 4, dt);
 
     state.camera.position.z = THREE.MathUtils.lerp(6.2, 0.35, dive * dive);
     state.camera.lookAt(0, 0, 0);
@@ -34,7 +34,7 @@ function Rig() {
   return (
     <group>
       <Float speed={1.4} rotationIntensity={0.15} floatIntensity={0.4}>
-        <group ref={group}>
+        <group ref={group} scale={0.82}>
           <Tyre />
         </group>
       </Float>
@@ -51,9 +51,10 @@ export default function HeroScene() {
       shadows
     >
       <color attach="background" args={["#07080A"]} />
-      <fog attach="fog" args={["#07080A", 6, 14]} />
-      <ambientLight intensity={0.15} />
-      <spotLight position={[4, 6, 5]} angle={0.35} penumbra={1} intensity={60} castShadow color="#fff3e6" />
+      <fog attach="fog" args={["#07080A", 9, 16]} />
+      <ambientLight intensity={0.35} />
+      <directionalLight position={[-3, 3, -4]} intensity={6} color="#ffd9c2" />
+      <spotLight position={[4, 6, 5]} angle={0.35} penumbra={1} intensity={140} castShadow color="#fff3e6" />
       <pointLight position={[-4, -1, 2]} intensity={25} color="#FF5A1F" />
       <pointLight position={[3, -3, -2]} intensity={12} color="#38BDF8" />
       <Rig />

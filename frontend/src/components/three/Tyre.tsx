@@ -63,12 +63,12 @@ export function Tyre({ accent = "#FF5A1F" }: { accent?: string }) {
     <group>
       {/* Carcass */}
       <mesh geometry={carcass} castShadow receiveShadow>
-        <meshStandardMaterial color="#141518" roughness={0.88} metalness={0.05} side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#202227" roughness={0.72} metalness={0.08} side={THREE.DoubleSide} />
       </mesh>
 
       {/* Tread blocks */}
       <instancedMesh ref={tread} args={[blockGeo, undefined, BLOCKS * 2]} castShadow>
-        <meshStandardMaterial color="#0e0f11" roughness={0.95} />
+        <meshStandardMaterial color="#17181c" roughness={0.8} />
       </instancedMesh>
 
       {/* Sidewall accent stripes */}
