@@ -52,7 +52,7 @@ def _msg(text: str, card: dict | None = None, quick: list[str] | None = None) ->
 
 
 def reply(session: Session, mechanic: Mechanic, text: str, now: datetime | None = None) -> list[dict]:
-    now = now or datetime.utcnow()
+    now = now or datetime.now()
     intent = detect(text)
     first = mechanic.name.split()[0]
 
