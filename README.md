@@ -4,7 +4,9 @@
 
 Grip Guild turns India's two-wheeler mechanics and puncture shops into measurable advocates for Eurogrip tyres. It gives them the three things that grow their business — **tools, customers and status** — instead of cash.
 
-Built for **Eurogrip TORQ Challenge 4.0 — Case Study 4** (mechanic & puncture-shop advocacy ecosystem) by Team Outliers.
+Built for **Eurogrip TORQ Challenge 4.0 — Case Study 4** (mechanic & puncture-shop advocacy ecosystem) by **Team Outliers**: Swayam Panchal, Rishit Lahoti and Jeevesh Bodhani, Department of Artificial Intelligence and Data Science, Dwarkadas J. Sanghvi College of Engineering.
+
+📄 Full solution report: [`docs/Grip_Guild_Solution_Report_Team_Outliers.docx`](docs/Grip_Guild_Solution_Report_Team_Outliers.docx)
 
 ---
 
