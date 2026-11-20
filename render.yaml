@@ -1,0 +1,19 @@
+# Render Blueprint — deploys the Grip Guild FastAPI backend on the free plan.
+# Free web services sleep after 15 idle minutes and have an ephemeral disk:
+# the API re-seeds its demo SQLite database on every boot, so a restart simply
+# returns the demo to a clean state.
+services:
+  - type: web
+    name: grip-guild-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: ALLOWED_ORIGINS
+        value: "*"
