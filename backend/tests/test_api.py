@@ -36,7 +36,7 @@ def test_core_flow():
 def test_bot_and_engines():
     with client() as c:
         mid = c.get("/api/mechanics/me").json()["mechanic"]["id"]
-        for text in ["namaste", "2", "3", "4", "5", "tread 1.9mm", "EGABCDEF1234", "xyz"]:
+        for text in ["hello", "2", "3", "4", "5", "tread 1.9mm", "EGABCDEF1234", "xyz"]:
             msgs = c.post("/api/bot", json={"mechanic_id": mid, "text": text}).json()["messages"]
             assert msgs and msgs[0]["text"]
         tl = c.post("/api/treadlens", json={"tread_mm": 1.5, "pattern": "edges", "psi": 22}).json()

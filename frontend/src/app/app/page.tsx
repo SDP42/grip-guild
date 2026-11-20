@@ -34,8 +34,8 @@ export default function AppHome() {
     <div className="space-y-4 px-4 pb-6 pt-4">
       <header className="flex items-center justify-between">
         <div>
-          <p className="text-xs text-bone-mute">Namaste 🙏</p>
-          <h1 className="font-display text-xl font-bold">{m.name.split(" ")[0]} ji</h1>
+          <p className="text-xs text-bone-mute">Welcome back</p>
+          <h1 className="font-display text-xl font-bold">{m.name.split(" ")[0]}</h1>
           <p className="text-xs text-bone-dim">{m.shop_name} · {me.district.name}</p>
         </div>
         <span className="chip !text-bone" style={{ borderColor: `${tc}66`, background: `${tc}18` }}>

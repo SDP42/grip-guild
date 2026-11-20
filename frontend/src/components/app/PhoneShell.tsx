@@ -71,7 +71,7 @@ export default function PhoneShell({ children }: { children: React.ReactNode }) 
           <li>Tap <b className="text-bone">Scan</b> → verify a tyre → watch the tool EMI move.</li>
           <li>Scan the same serial twice → Fraud Guard blocks it.</li>
           <li><b className="text-bone">Refer</b> → generate a code → simulate the dealer redeeming it.</li>
-          <li><b className="text-bone">Bot</b> → type &quot;namaste&quot;, &quot;2&quot; or &quot;refer karo&quot;.</li>
+          <li><b className="text-bone">Bot</b> → type &quot;hello&quot;, &quot;2&quot; or &quot;refer a rider&quot;.</li>
           <li><b className="text-bone">More → TreadLens</b> → build a rider health card.</li>
         </ol>
       </aside>

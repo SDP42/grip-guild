@@ -1,6 +1,6 @@
-"""Guild Bot — WhatsApp-first, vernacular, zero-install.
+"""Guild Bot — WhatsApp-first, zero-install.
 
-A rules-based intent engine (keyword + Hinglish synonyms + menu numbers).
+A rules-based intent engine (keywords + synonyms + menu numbers).
 Production would sit behind the WhatsApp Business Cloud API; the same
 `reply()` function powers the in-browser simulator.
 """
@@ -16,10 +16,10 @@ from .tiers import next_tier, tier_for
 from .treadlens import analyse
 
 INTENTS = {
-    "menu": ["hi", "hello", "namaste", "menu", "start", "help", "namaskar", "vanakkam", "0"],
-    "scan": ["scan", "fit", "fitment", "lagaya", "1"],
-    "points": ["points", "point", "balance", "kitne", "wallet", "2"],
-    "refer": ["refer", "referral", "code", "bhejo", "customer", "3"],
+    "menu": ["hi", "hello", "hey", "menu", "start", "help", "0"],
+    "scan": ["scan", "fit", "fitment", "fitted", "1"],
+    "points": ["points", "point", "balance", "wallet", "2"],
+    "refer": ["refer", "referral", "code", "customer", "3"],
     "tools": ["tool", "tools", "emi", "lease", "machine", "4"],
     "rank": ["rank", "leaderboard", "circle", "position", "5"],
     "tread": ["tread", "treadlens", "check", "health", "6"],
@@ -57,7 +57,7 @@ def reply(session: Session, mechanic: Mechanic, text: str, now: datetime | None 
     first = mechanic.name.split()[0]
 
     if intent == "menu":
-        return [_msg(f"Namaste {first} ji 🙏 Welcome to *Grip Guild*.\nReply with a number:\n" + "\n".join(MENU),
+        return [_msg(f"Hello {first} 👋 Welcome to *Grip Guild*.\nReply with a number:\n" + "\n".join(MENU),
                      quick=["1", "2", "3", "4", "5", "6"])]
 
     if intent == "scan":
@@ -154,5 +154,5 @@ def reply(session: Session, mechanic: Mechanic, text: str, now: datetime | None 
                      card={"type": "treadlens", **res}, quick=["3"])]
 
     count = session.exec(select(func.count()).select_from(Fitment)).one()
-    return [_msg(f"Sorry, I didn't get that. 🙏 {count:,} fitments verified on the Guild so far.\nType *menu*.",
+    return [_msg(f"Sorry, I didn't get that. {count:,} fitments verified on the Guild so far.\nType *menu*.",
                  quick=["menu"])]
