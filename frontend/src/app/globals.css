@@ -64,3 +64,12 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* Custom cursor: hide the system arrow only when our cursor is active */
+@media (pointer: fine) {
+  html.gg-cursor, html.gg-cursor a, html.gg-cursor button { cursor: none; }
+}
+
+/* Responsive guards: grid/flex children may shrink below content width; never scroll sideways */
+.grid > * { min-width: 0; }
+body { overflow-x: clip; }

@@ -1,4 +1,7 @@
 import SmoothScroll from "@/components/SmoothScroll";
+import Ignition from "@/components/fx/Ignition";
+import Speedometer from "@/components/fx/Speedometer";
+import Cursor from "@/components/fx/Cursor";
 import Nav from "@/components/landing/Nav";
 import Hero from "@/components/landing/Hero";
 import Marquee from "@/components/landing/Marquee";
@@ -16,6 +19,9 @@ import FilmStrip from "@/components/landing/FilmStrip";
 export default function Home() {
   return (
     <SmoothScroll>
+      <Ignition />
+      <Cursor />
+      <Speedometer />
       <Nav />
       <main>
         <Hero />
